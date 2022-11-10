@@ -1,16 +1,24 @@
-export type ColumnType = {
+export type ToDo = {
+  title: string;
+  memo: string;
+  subTask: string[];
+  toDoDate: Date | null;
+};
+
+export type ToDoColumn = {
   id: string;
   title: string;
   taskIds: string[];
+  status: "todo" | "doing" | "done";
 };
 
-export type TaskType = {
+export type ToDoTask = {
   id: string;
-  content: string;
+  content: ToDo;
 };
 
 export type Board = {
-  tasks: { [key: string]: TaskType };
-  columns: { [key: string]: ColumnType };
+  tasks: { [key: string]: ToDoTask };
+  columns: { [key: string]: ToDoColumn };
   columnOrder: string[];
 };
