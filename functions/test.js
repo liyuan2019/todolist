@@ -8,7 +8,7 @@ exports = async function(payload, response) {
   }
   // Execute application logic, such as working with MongoDB
   const cluster = context.services.get('mongodb-atlas');
-  const requests = cluster.db("demo").collection("requests");
+  const requests = cluster.db("todolist").collection("users");
   try {
     const { insertedId } = await requests.insertOne({ someField });
     // Respond with an affirmative result
