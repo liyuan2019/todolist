@@ -1,19 +1,20 @@
 exports = async function(payload, response) {
+  if(payload.body === undefined) {
+      response.setStatusCode(400)
+    response.setBody(`Could not find payload in the endpoint request body.`);
+    }
+    
   // Convert the request body from BSON to a JSON object and then pull out relevant fields
   const body = JSON.parse(payload.body.text());
-  // If the request is missing required fields or something else is wrong, respond with an error
-  if (!body) {
-    response.setStatusCode(400)
-    response.setBody(`Could not find payload in the endpoint request body.`);
-  }
+  
   // Execute application logic, such as working with MongoDB
   const cluster = context.services.get('mongodb-atlas');
   const requests = cluster.db("todolist").collection("users");
   try {
-    const result = await requests.findOne(body);
+    const {document} = await requests.findOne(body);
     // Respond with an affirmative result
     response.setStatusCode(200)
-    response.setBody(result);
+    response.setBody(JSON.stringify(document));
   } catch (err) {
     // If the insert fails for some reason, respond with an error
     response.setStatusCode(500)
