@@ -10,7 +10,7 @@ exports = async function(payload, response) {
   const cluster = context.services.get('mongodb-atlas');
   const requests = cluster.db("todolist").collection("users");
   try {
-    const { document } = await requests.findOne(body);
+    const result = await requests.findOne(body);
     // Respond with an affirmative result
     response.setStatusCode(200)
     response.setBody(`Successfully find a document`);
