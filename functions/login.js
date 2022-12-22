@@ -13,7 +13,7 @@ exports = async function(payload, response) {
     const result = await requests.findOne(body);
     // Respond with an affirmative result
     response.setStatusCode(200)
-    response.setBody(`Successfully find a document`);
+    response.setBody(result);
   } catch (err) {
     // If the insert fails for some reason, respond with an error
     response.setStatusCode(500)
