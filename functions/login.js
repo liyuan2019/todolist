@@ -13,8 +13,14 @@ exports = async function(payload, response) {
   try {
     const result = await requests.findOne(body);
     // Respond with an affirmative result
-    response.setStatusCode(200)
+    if(result) {
+      response.setStatusCode(200)
     response.setBody(JSON.stringify(result));
+    } else {
+      response.setStatusCode(400)
+    response.setBody("Failed to find a document for the request");
+    }
+    
   } catch (err) {
     // If the insert fails for some reason, respond with an error
     response.setStatusCode(500)
