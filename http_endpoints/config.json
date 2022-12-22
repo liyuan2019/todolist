@@ -12,7 +12,7 @@
     },
     {
         "route": "/login",
-        "http_method": "GET",
+        "http_method": "POST",
         "function_name": "login",
         "validation_method": "NO_VALIDATION",
         "respond_result": true,
