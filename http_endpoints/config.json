@@ -1,8 +1,8 @@
 [
     {
-        "route": "/test",
+        "route": "/signup",
         "http_method": "POST",
-        "function_name": "test",
+        "function_name": "signup",
         "validation_method": "NO_VALIDATION",
         "respond_result": true,
         "fetch_custom_user_data": false,
