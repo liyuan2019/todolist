@@ -15,7 +15,7 @@ exports = async function(payload, response) {
     response.setStatusCode(200)
     response.setBody(`Successfully created a document for the request with _id: ${insertedId}.`);
   } catch (err) {
-    // If the insert fails for some reason, respond with an error
+    // If the insert fails for some reason, respond with an err
     response.setStatusCode(500)
     response.setBody(`Failed to create a document for the request. ${err}`)
   }
