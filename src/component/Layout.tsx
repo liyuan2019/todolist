@@ -3,17 +3,23 @@ import { theme } from "../styles/theme";
 import { ReactNode } from "react";
 import styled, { ThemeProvider } from "styled-components";
 import { Header } from "./Header";
+import { Board } from "@/type";
 
 type LayoutProps = {
   children: ReactNode;
   openModal: () => void;
+  setState: React.Dispatch<React.SetStateAction<Board>>;
 };
 
-export const Layout: React.FC<LayoutProps> = ({ children, openModal }) => {
+export const Layout: React.FC<LayoutProps> = ({
+  children,
+  openModal,
+  setState,
+}) => {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <Header openModal={openModal} />
+      <Header openModal={openModal} setState={setState} />
       <Main>{children}</Main>
     </ThemeProvider>
   );

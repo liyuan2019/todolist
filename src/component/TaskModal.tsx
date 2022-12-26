@@ -104,8 +104,10 @@ export const TaskModal: React.FC<TaskModalProps> = ({ useModalReturn }) => {
           <div>
             <DatePicker
               className="date-picker"
-              selected={toDoDate}
-              onChange={(date) => setTodoDate(date)}
+              selected={new Date(toDoDate)}
+              onChange={(date) =>
+                setTodoDate(date ? date.toLocaleDateString() : "")
+              }
               locale="ja"
               dateFormat="yyyy/MM/dd"
               minDate={today}

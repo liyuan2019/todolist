@@ -13,7 +13,7 @@ export const App: React.FC = () => {
   const { openModal, onClickTask } = useModalReturn;
 
   return (
-    <Layout openModal={openModal}>
+    <Layout openModal={openModal} setState={setState}>
       <TaskModal useModalReturn={useModalReturn} />
       <DragDropContext onDragEnd={onDragEnd}>
         <Container>

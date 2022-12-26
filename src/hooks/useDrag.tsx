@@ -1,9 +1,10 @@
 import initialData from "../data/initial-data";
 import { useState } from "react";
 import { DropResult } from "react-beautiful-dnd";
+import { Board } from "@/type";
 
 export const useDrag = () => {
-  const [state, setState] = useState(initialData);
+  const [state, setState] = useState<Board>(initialData);
 
   const onDragEnd = (result: DropResult) => {
     const { destination, source, draggableId } = result;

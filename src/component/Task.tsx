@@ -44,12 +44,12 @@ export const Task: React.FC<TaskProps> = ({
           {task.content.toDoDate && (
             <ScheduledDate
               isExpired={
-                new Date(task.content.toDoDate.toLocaleDateString()) <
+                new Date(task.content.toDoDate) <
                 new Date(new Date().toLocaleDateString())
               }
             >
               <CgCalendarDue />
-              <span>{task.content.toDoDate?.toLocaleDateString()}</span>
+              <span>{task.content.toDoDate}</span>
             </ScheduledDate>
           )}
         </Container>

@@ -1,14 +1,40 @@
 import { theme } from "../styles/theme";
+import Modal from "react-modal";
 import styled from "styled-components";
 import { SiTodoist } from "react-icons/si";
 import { IoIosNotifications, IoIosSettings, IoMdSearch } from "react-icons/io";
 import { BiChevronDown } from "react-icons/bi";
 import { MdAdd } from "react-icons/md";
 import { AiFillQuestionCircle } from "react-icons/ai";
-import { useCallback, useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+import axios from "axios";
+import initialData from "../data/initial-data";
+import { Board } from "@/type";
+
+Modal.setAppElement("#root");
+
+const baseURL =
+  "https://us-east-1.aws.data.mongodb-api.com/app/application-0-kydyf/endpoint";
+
+const modalStyle = {
+  overlay: {
+    backgroundColor: `${theme.colors.backgroundOverlay}`,
+  },
+  content: {
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+    padding: "100px",
+    width: "800px",
+    maxHeight: `${theme.modalDialogMaxHeight}`,
+  },
+};
 
 type Menu = {
   title: string;
@@ -21,9 +47,31 @@ type Menu = {
 
 type HeaderProps = {
   openModal: () => void;
+  setState: React.Dispatch<React.SetStateAction<Board>>;
 };
 
-export const Header: React.FC<HeaderProps> = ({ openModal }) => {
+export const Header: React.FC<HeaderProps> = ({ openModal, setState }) => {
+  const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
+  const [isSignUp, setIsSignUp] = useState<boolean>(false);
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [isLoginError, setIsLoginError] = useState<boolean>(false);
+  // const [isSystemError, setIsSystemError] = useState<boolean>(false);
+  const [isLogged, setIsLogged] = useState<string>("");
+
+  const onChangeName = (e: ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value);
+  };
+
+  const onChangeEmail = (e: ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+
+  const onChangePassword = (e: ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
+
   const [menu, setMenu] = useState<Menu[]>([
     {
       title: "あなたの作業",
@@ -103,6 +151,94 @@ export const Header: React.FC<HeaderProps> = ({ openModal }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const openLoginModal = () => {
+    setIsSignUp(false);
+    setLoginModalOpen(true);
+  };
+
+  const closeLoginModal = () => {
+    setName("");
+    setEmail("");
+    setPassword("");
+    setIsLoginError(false);
+    setLoginModalOpen(false);
+  };
+
+  const openSignUp = () => {
+    setIsLoginError(false);
+    setIsSignUp(true);
+  };
+
+  const signUp = () => {
+    const data = JSON.stringify({
+      email: email,
+      password: password,
+      showname: name,
+      data: initialData,
+    });
+
+    const config = {
+      method: "post",
+      url: `${baseURL}/signup`,
+      headers: {
+        "Content-Type": "application/json",
+        // "Access-Control-Request-Headers": "*",
+      },
+      data: data,
+    };
+    axios(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+        setName("");
+        setEmail("");
+        setPassword("");
+        setIsSignUp(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsLoginError(true);
+      });
+  };
+
+  const login = () => {
+    const data = JSON.stringify({
+      email: email,
+      password: password,
+    });
+
+    const config = {
+      method: "post",
+      url: `${baseURL}/login`,
+      headers: {
+        "Content-Type": "application/json",
+        // "Access-Control-Request-Headers": "*",
+      },
+      data: data,
+    };
+    axios(config)
+      .then((response) => {
+        // console.log(JSON.stringify(response.data));
+        // if (response.status === 200) {
+        setLoginModalOpen(false);
+        setIsLogged(response.data.showname);
+        console.log(response.data.data);
+        setState(response.data.data);
+        setEmail("");
+        setPassword("");
+        // } else {
+        //   setIsLoginError(true);
+        // }
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsLoginError(true);
+      });
+  };
+
+  const logout = () => {
+    setIsLogged("");
+  };
+
   return (
     <>
       <HeaderStyle>
@@ -160,15 +296,15 @@ export const Header: React.FC<HeaderProps> = ({ openModal }) => {
               </Dropdown>
             )}
           </MenuBar>
-          <Button onClick={openModal}>
+          <CreateButton onClick={openModal}>
             <Txt>作成</Txt>
             <StyledMdAdd size={20} />
-          </Button>
+          </CreateButton>
           <Space />
         </Nav>
         <RightDiv>
           <SeachWrapper data-tip="検索">
-            <Search type="text" placeholder="検索" enterKeyHint="search" />
+            <Input type="text" placeholder="検索" enterKeyHint="search" />
             <SearchIcon />
           </SeachWrapper>
           <IconButtonSearch>
@@ -183,9 +319,22 @@ export const Header: React.FC<HeaderProps> = ({ openModal }) => {
           <IconButton data-tip="設定">
             <IoIosSettings size={24} />
           </IconButton>
-          <IconButton data-tip="プロフィールと設定">
-            <ProfileImg />
-          </IconButton>
+          {isLogged === "" ? (
+            <IconButton data-tip="プロフィールと設定" onClick={openLoginModal}>
+              {/* <ProfileImg /> */}
+              LOGIN
+            </IconButton>
+          ) : (
+            <Dropdown as={ButtonWrapper}>
+              <Dropdown.Toggle as={MenuButton}>
+                <span>{isLogged}</span>
+                <BiChevronDown size={16} color="#97A1AF" />
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={logout}>ログアウト</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          )}
         </RightDiv>
         {/* <ReactTooltip
           place="bottom"
@@ -194,9 +343,76 @@ export const Header: React.FC<HeaderProps> = ({ openModal }) => {
           className="react-tool-tip"
         /> */}
       </HeaderStyle>
+      <Modal
+        isOpen={loginModalOpen}
+        // onAfterOpen={afterOpenModal}
+        onRequestClose={closeLoginModal}
+        style={modalStyle}
+        contentLabel="ログイン"
+      >
+        <ModalHeader>{isSignUp ? "サインアップ" : "ログイン"}</ModalHeader>
+        <InputWrapper>
+          {isSignUp && (
+            <Input
+              type="text"
+              placeholder="name"
+              value={name}
+              onChange={onChangeName}
+            />
+          )}
+          <Input
+            type="email"
+            placeholder="email"
+            value={email}
+            onChange={onChangeEmail}
+          />
+          <Input
+            type="password"
+            placeholder="password"
+            value={password}
+            onChange={onChangePassword}
+          />
+          <div>
+            <Button onClick={isSignUp ? signUp : login}>
+              {isSignUp ? "SIGN UP" : "LOGIN"}
+            </Button>
+            {isLoginError && <Error>email と password が間違ってます</Error>}
+            {/* {isSystemError && <Error>システムの原因でログイン出来ないです</Error>} */}
+          </div>
+          {!isSignUp && (
+            <MenuButtonStyled onClick={openSignUp}>
+              サインアップ(SIGN UP)
+            </MenuButtonStyled>
+          )}
+        </InputWrapper>
+      </Modal>
     </>
   );
 };
+
+// const ButtonLink = styled.button`
+//   font-size: 14px;
+// `;
+
+const Error = styled.p`
+  font-size: 12px;
+  color: red;
+  text-align: center;
+`;
+
+const ModalHeader = styled.div`
+  font-size: 20px;
+  margin-bottom: 40px;
+`;
+
+const InputWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  border: 1px solid ${theme.colors.textInputBorder};
+  border-radius: 3px;
+  padding: 40px;
+`;
 
 const HeaderStyle = styled.header`
   display: flex;
@@ -207,6 +423,10 @@ const HeaderStyle = styled.header`
   position: relative;
   background-color: #ffffff;
   color: ${theme.colors.textMenu};
+
+  .dropdown-toggle::after {
+    display: none;
+  }
 
   &::after {
     content: "";
@@ -261,10 +481,6 @@ const MenuBar = styled.div`
   height: 100%;
   position: relative;
 
-  .dropdown-toggle::after {
-    display: none;
-  }
-
   .selected {
     color: ${theme.colors.primaryblue};
     &::after {
@@ -308,13 +524,18 @@ const MenuButton = styled.button`
   }
 `;
 
+const MenuButtonStyled = styled(MenuButton)`
+  font-size: 12px;
+  text-decoration: underline;
+`;
+
 const Button = styled.button`
   background-color: ${theme.colors.primaryblue};
   border-radius: 3px;
   color: white;
   padding: 0px 10px;
-  margin-left: 12px;
   height: 32px;
+  width: 100%;
 
   &:hover {
     opacity: ${theme.opacity};
@@ -328,6 +549,10 @@ const Button = styled.button`
   @media screen and (max-width: 961px) {
     padding: 0px 6px;
   }
+`;
+
+const CreateButton = styled(Button)`
+  margin-left: 12px;
 `;
 
 const Txt = styled.span`
@@ -364,7 +589,7 @@ const SeachWrapper = styled.div`
   }
 `;
 
-const Search = styled.input`
+const Input = styled.input`
   height: 32px;
   width: 100%;
   padding: 0px 12px 0px 30px;
@@ -410,10 +635,10 @@ const StyledIoIosNotifications = styled(IoIosNotifications)`
   transform: rotate(45deg);
 `;
 
-const ProfileImg = styled.div`
-  height: 24px;
-  width: 24px;
-  background-image: url(https://dummyimage.com/24x24.png);
-  border-radius: 50%;
-  flex-shrink: 0;
-`;
+// const ProfileImg = styled.div`
+//   height: 24px;
+//   width: 24px;
+//   background-image: url(https://dummyimage.com/24x24.png);
+//   border-radius: 50%;
+//   flex-shrink: 0;
+// `;

@@ -2,7 +2,7 @@ export type ToDo = {
   title: string;
   memo: string;
   subTask: string[];
-  toDoDate: Date | null;
+  toDoDate: string;
 };
 
 export type ToDoColumn = {

@@ -6,7 +6,7 @@ export const useModal = (
   state: Board,
   setState: React.Dispatch<React.SetStateAction<Board>>
 ) => {
-  const today = new Date();
+  const today = new Date().toLocaleDateString();
   const [modalOpen, setModalOpen] = useState(false);
   const { addTodo, editTodo, deleteTodo } = useToDoList(state, setState);
   const [todo, setTodo] = useState<ToDo>({
@@ -18,7 +18,7 @@ export const useModal = (
 
   const [title, setTitle] = useState<string>("");
   const [memo, setMemo] = useState<string>("");
-  const [toDoDate, setTodoDate] = useState<Date | null>(today);
+  const [toDoDate, setTodoDate] = useState<string>(today);
   const [subTask, setSubTask] = useState<string[]>([]);
   const [editFlag, setEditFlag] = useState<boolean>(false);
   const [editTaskId, setEditTaskId] = useState<string>("");
@@ -62,7 +62,7 @@ export const useModal = (
       title: "",
       memo: "",
       subTask: [],
-      toDoDate: new Date(),
+      toDoDate: new Date().toLocaleDateString(),
     });
     setEditFlag(false);
     setEditTaskId("");
