@@ -11,7 +11,7 @@ exports = async function(payload, response) {
   const cluster = context.services.get('mongodb-atlas');
   const requests = cluster.db("todolist").collection("users");
   try {
-    const result = await requests.updateOne({"_id": body._id},{$set: {"data": body.data}});
+    const result = await requests.updateOne({"_id": ObjectId(body._id)},{$set: {"data": body.data}});
     response.setStatusCode(200)
     response.setBody(JSON.stringify(result));
   } catch (err) {
