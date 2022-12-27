@@ -18,7 +18,7 @@ exports = async function(payload, response) {
     response.setBody(JSON.stringify(result));
     } else {
       response.setStatusCode(400)
-    response.setBody(JSON.stringify({code: "no_record", message: "Failed to find the user for the request" }));
+    response.setBody(JSON.stringify({code: "no_record", message: "The email or the password is not correct" }));
     }
     
   } catch (err) {
