@@ -13,16 +13,16 @@ exports = async function(payload, response) {
     const find = await requests.findOne({"email": body.email})
     if (find) {
       response.setStatusCode(500);
-      response.setBody({"code": "email_already_exits", "message": "This email has already been registered."})
+      response.setBody(JSON.stringify({code: "email_already_exits", message: "This email has already been registered."}))
     } else {
       const { insertedId } = await requests.insertOne(body);
     // Respond with an affirmative result
     response.setStatusCode(200)
-    response.setBody({"code": "successful", "message": `Successfully created a document for the request with _id: ${insertedId}.`});
+    response.setBody(JSON.stringify({code: "successful", message: `Successfully created a document for the request with _id: ${insertedId}.`}));
     }
   } catch (err) {
     // If the insert fails for some reason, respond with an err
     response.setStatusCode(500)
-    response.setBody({"code": "system_error", "message": `Failed to create a document for the request. ${err}` })
+    response.setBody(JSON.stringify({code: "system_error", message: `Failed to create a document for the request. ${err}` }))
   }
 }
