@@ -10,13 +10,19 @@ exports = async function(payload, response) {
   const cluster = context.services.get('mongodb-atlas');
   const requests = cluster.db("todolist").collection("users");
   try {
-    const { insertedId } = await requests.insertOne(body);
+    const find = await requests.findOne({"email": body.email})
+    if (find) {
+      response.setStatusCode(500);
+      response.setBody({"code": "email_already_exits", "message": "This email has already been registered."})
+    } else {
+      const { insertedId } = await requests.insertOne(body);
     // Respond with an affirmative result
     response.setStatusCode(200)
-    response.setBody(`Successfully created a document for the request with _id: ${insertedId}.`);
+    response.setBody({"code": "successful", "message": `Successfully created a document for the request with _id: ${insertedId}.`});
+    }
   } catch (err) {
     // If the insert fails for some reason, respond with an err
     response.setStatusCode(500)
-    response.setBody(`Failed to create a document for the request. ${err}`)
+    response.setBody({"code": "system_error", "message": `Failed to create a document for the request. ${err}` })
   }
 }
