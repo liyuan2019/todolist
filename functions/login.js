@@ -1,7 +1,7 @@
 exports = async function(payload, response) {
   if(payload.body === undefined) {
       response.setStatusCode(400)
-    response.setBody(`Could not find payload in the endpoint request body.`);
+    response.setBody(JSON.stringify({code: "no_payload", message: "Could not find payload in the endpoint request body."}));
     }
     
   // Convert the request body from BSON to a JSON object and then pull out relevant fields
@@ -18,12 +18,12 @@ exports = async function(payload, response) {
     response.setBody(JSON.stringify(result));
     } else {
       response.setStatusCode(400)
-    response.setBody("Failed to find a document for the request");
+    response.setBody(JSON.stringify({code: "no_record", message: "Failed to find the user for the request" }));
     }
     
   } catch (err) {
     // If the insert fails for some reason, respond with an error
     response.setStatusCode(500)
-    response.setBody(`Failed to find a document for the request. ${err}`)
+    response.setBody(JSON.stringify({code: "system_error", message: `Failed to find the user for the request. ${err}`}))
   }
 }

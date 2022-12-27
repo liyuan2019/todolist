@@ -4,7 +4,7 @@ exports = async function(payload, response) {
   // If the request is missing required fields or something else is wrong, respond with an error
   if (!body) {
     response.setStatusCode(400)
-    response.setBody(`Could not find payload in the endpoint request body.`);
+    response.setBody(JSON.stringify({code: "no_payload", message: "Could not find payload in the endpoint request body."}));
   }
   // Execute application logic, such as working with MongoDB
   const cluster = context.services.get('mongodb-atlas');
