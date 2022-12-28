@@ -103,6 +103,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({ useModalReturn }) => {
           <RiCalendarTodoFill color={theme.colors.primaryblue} />
           <div>
             <DatePicker
+              popperPlacement="right-start"
               className="date-picker"
               selected={new Date(toDoDate)}
               onChange={(date) =>
@@ -227,9 +228,13 @@ const SubtaskCreateButton = styled(MenuButton)`
   padding: 0px 5px;
 `;
 
-const TaskDate = styled(SubtaskCreateButton)`
+const TaskDate = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  line-height: 32px;
+  padding: 0px 5px;
   margin-top: 10px;
-  background-color: ${theme.colors.backgroundInput};
 
   .date-picker {
     background-color: ${theme.colors.backgroundInput};
