@@ -13,11 +13,12 @@ export const useToDoList = (
     (toDo: ToDo) => {
       const newState = lodash.cloneDeep(state);
       const newToDoTask = {
-        id: "task-" + (state.columns["column-1"].taskIds.length + 1),
+        id: "task-" + (state.count + 1),
         content: toDo,
       };
       newState.tasks[newToDoTask.id] = newToDoTask;
       newState.columns["column-1"].taskIds.push(newToDoTask.id);
+      newState.count++;
 
       setState(newState);
       updateTasks(newState);

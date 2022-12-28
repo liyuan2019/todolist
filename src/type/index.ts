@@ -19,6 +19,7 @@ export type ToDoTask = {
 
 export type Board = {
   tasks: { [key: string]: ToDoTask };
+  count: number;
   columns: { [key: string]: ToDoColumn };
   columnOrder: string[];
 };

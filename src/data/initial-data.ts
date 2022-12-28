@@ -7,6 +7,7 @@ export const initialData: Board = {
     // "task-3": { id: "task-3", content: "Charge my phone" },
     // "task-4": { id: "task-4", content: "Cook dinner" },
   },
+  count: 0,
   columns: {
     "column-1": {
       id: "column-1",
