@@ -11,13 +11,12 @@ import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
-import initialData from "../data/initial-data";
+import { baseURL, initialData } from "../data/initial-data";
 import { Board } from "@/type";
 
-Modal.setAppElement("#root");
+export let loginId = "";
 
-const baseURL =
-  "https://us-east-1.aws.data.mongodb-api.com/app/application-0-kydyf/endpoint";
+Modal.setAppElement("#root");
 
 const modalStyle = {
   overlay: {
@@ -56,9 +55,10 @@ export const Header: React.FC<HeaderProps> = ({ openModal, setState }) => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [isLoginError, setIsLoginError] = useState<boolean>(false);
+  const [loginError, setLoginError] = useState<string>("");
   // const [isSystemError, setIsSystemError] = useState<boolean>(false);
   const [isLogged, setIsLogged] = useState<string>("");
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
 
   const onChangeName = (e: ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
@@ -160,16 +160,22 @@ export const Header: React.FC<HeaderProps> = ({ openModal, setState }) => {
     setName("");
     setEmail("");
     setPassword("");
-    setIsLoginError(false);
+    setLoginError("");
     setLoginModalOpen(false);
   };
 
   const openSignUp = () => {
-    setIsLoginError(false);
+    setLoginError("");
     setIsSignUp(true);
   };
 
   const signUp = () => {
+    setIsDisabled(true);
+    setLoginError("");
+    if (email === "" || password === "" || name === "") {
+      setLoginError("All the inputs are required.");
+      return;
+    }
     const data = JSON.stringify({
       email: email,
       password: password,
@@ -182,13 +188,12 @@ export const Header: React.FC<HeaderProps> = ({ openModal, setState }) => {
       url: `${baseURL}/signup`,
       headers: {
         "Content-Type": "application/json",
-        // "Access-Control-Request-Headers": "*",
       },
       data: data,
     };
     axios(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
+        setIsDisabled(false);
         setName("");
         setEmail("");
         setPassword("");
@@ -196,11 +201,18 @@ export const Header: React.FC<HeaderProps> = ({ openModal, setState }) => {
       })
       .catch((error) => {
         console.log(error);
-        setIsLoginError(true);
+        setIsDisabled(false);
+        setLoginError(error.response.data.message);
       });
   };
 
   const login = () => {
+    setIsDisabled(true);
+    setLoginError("");
+    if (email === "" || password === "") {
+      setLoginError("All the inputs are required.");
+      return;
+    }
     const data = JSON.stringify({
       email: email,
       password: password,
@@ -211,32 +223,29 @@ export const Header: React.FC<HeaderProps> = ({ openModal, setState }) => {
       url: `${baseURL}/login`,
       headers: {
         "Content-Type": "application/json",
-        // "Access-Control-Request-Headers": "*",
       },
       data: data,
     };
     axios(config)
       .then((response) => {
-        // console.log(JSON.stringify(response.data));
-        // if (response.status === 200) {
+        setIsDisabled(false);
         setLoginModalOpen(false);
         setIsLogged(response.data.showname);
-        console.log(response.data.data);
         setState(response.data.data);
+        loginId = response.data._id;
         setEmail("");
         setPassword("");
-        // } else {
-        //   setIsLoginError(true);
-        // }
       })
       .catch((error) => {
         console.log(error);
-        setIsLoginError(true);
+        setIsDisabled(false);
+        setLoginError(error.response.data.message);
       });
   };
 
   const logout = () => {
     setIsLogged("");
+    setState(initialData);
   };
 
   return (
@@ -373,10 +382,10 @@ export const Header: React.FC<HeaderProps> = ({ openModal, setState }) => {
             onChange={onChangePassword}
           />
           <div>
-            <Button onClick={isSignUp ? signUp : login}>
+            <Button onClick={isSignUp ? signUp : login} disabled={isDisabled}>
               {isSignUp ? "SIGN UP" : "LOGIN"}
             </Button>
-            {isLoginError && <Error>email と password が間違ってます</Error>}
+            {loginError !== "" && <Error>{loginError}</Error>}
             {/* {isSystemError && <Error>システムの原因でログイン出来ないです</Error>} */}
           </div>
           {!isSignUp && (

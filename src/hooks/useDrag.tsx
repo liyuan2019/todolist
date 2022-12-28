@@ -1,10 +1,13 @@
-import initialData from "../data/initial-data";
+import { initialData } from "../data/initial-data";
 import { useState } from "react";
 import { DropResult } from "react-beautiful-dnd";
 import { Board } from "@/type";
+import { useUpdateTasks } from "./useUpdateTasks";
 
 export const useDrag = () => {
   const [state, setState] = useState<Board>(initialData);
+
+  const { updateTasks } = useUpdateTasks();
 
   const onDragEnd = (result: DropResult) => {
     const { destination, source, draggableId } = result;
@@ -42,6 +45,7 @@ export const useDrag = () => {
       };
 
       setState(newState);
+      updateTasks(newState);
       return;
     }
 
@@ -69,6 +73,7 @@ export const useDrag = () => {
       },
     };
     setState(newState);
+    updateTasks(newState);
   };
 
   return { state, setState, onDragEnd };

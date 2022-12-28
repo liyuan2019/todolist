@@ -1,24 +1,28 @@
 import { Board, ToDo } from "@/type";
 import lodash from "lodash";
 import { useCallback } from "react";
+import { useUpdateTasks } from "./useUpdateTasks";
 
 export const useToDoList = (
   state: Board,
   setState: React.Dispatch<React.SetStateAction<Board>>
 ) => {
+  const { updateTasks } = useUpdateTasks();
+
   const addTodo = useCallback(
     (toDo: ToDo) => {
       const newState = lodash.cloneDeep(state);
       const newToDoTask = {
-        id: "task-" + state.columns["column-1"].taskIds.length,
+        id: "task-" + (state.columns["column-1"].taskIds.length + 1),
         content: toDo,
       };
       newState.tasks[newToDoTask.id] = newToDoTask;
       newState.columns["column-1"].taskIds.push(newToDoTask.id);
 
       setState(newState);
+      updateTasks(newState);
     },
-    [setState, state]
+    [setState, state, updateTasks]
   );
 
   const deleteTodo = useCallback(
@@ -30,8 +34,9 @@ export const useToDoList = (
         1
       );
       setState(newState);
+      updateTasks(newState);
     },
-    [setState, state]
+    [setState, state, updateTasks]
   );
 
   const editTodo = useCallback(
@@ -40,8 +45,9 @@ export const useToDoList = (
       newState.tasks[id].content = toDo;
 
       setState(newState);
+      updateTasks(newState);
     },
-    [setState, state]
+    [setState, state, updateTasks]
   );
 
   return { addTodo, editTodo, deleteTodo };

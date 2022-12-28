@@ -1,6 +1,6 @@
 import { Board } from "../type";
 
-const initialData: Board = {
+export const initialData: Board = {
   tasks: {
     // "task-1": { id: "task-1", content: "Take out the garbage" },
     // "task-2": { id: "task-2", content: "Watch my favorite show" },
@@ -32,4 +32,5 @@ const initialData: Board = {
   columnOrder: ["column-1", "column-2", "column-3"],
 };
 
-export default initialData;
+export const baseURL =
+  "https://us-east-1.aws.data.mongodb-api.com/app/application-0-kydyf/endpoint";
