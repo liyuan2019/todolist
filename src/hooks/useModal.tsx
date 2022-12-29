@@ -130,6 +130,7 @@ export const useModal = (
     subTask,
     toDoDate,
     editFlag,
+    editColumnId,
     openModal,
     closeModal,
     onChangeTitle,

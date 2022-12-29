@@ -12,7 +12,7 @@ import { Dropdown } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
 import { baseURL, initialData } from "../data/initial-data";
-import { Board } from "@/type";
+import { Board, ToDo } from "../type";
 
 export let loginId = "";
 
@@ -35,6 +35,20 @@ const modalStyle = {
   },
 };
 
+const searchModalStyle = {
+  overlay: {
+    backgroundColor: "transparent",
+  },
+  content: {
+    top: "50px",
+    left: "auto",
+    right: "20px",
+    bottom: "auto",
+    width: "800px",
+    maxHeight: `${theme.modalDialogMaxHeight}`,
+  },
+};
+
 type Menu = {
   title: string;
   subMenu: {
@@ -44,14 +58,28 @@ type Menu = {
   show: boolean;
 };
 
-type HeaderProps = {
-  openModal: () => void;
-  setState: React.Dispatch<React.SetStateAction<Board>>;
+type SearchResult = {
+  id: string;
+  content: ToDo;
+  columnId: string;
 };
 
-export const Header: React.FC<HeaderProps> = ({ openModal, setState }) => {
+type HeaderProps = {
+  openModal: () => void;
+  state: Board;
+  setState: React.Dispatch<React.SetStateAction<Board>>;
+  onClickTask: (todo: ToDo, columnId: string, taskId: string) => void;
+};
+
+export const Header: React.FC<HeaderProps> = ({
+  openModal,
+  state,
+  setState,
+  onClickTask,
+}) => {
   const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
+  const [seachText, setSearchText] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -59,6 +87,13 @@ export const Header: React.FC<HeaderProps> = ({ openModal, setState }) => {
   // const [isSystemError, setIsSystemError] = useState<boolean>(false);
   const [isLogged, setIsLogged] = useState<string>("");
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
+  const [composing, setComposition] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState<boolean>(false);
+  const [searchResult, setSearchResult] = useState<SearchResult[]>([]);
+
+  const onChangeSearchText = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+  };
 
   const onChangeName = (e: ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
@@ -164,6 +199,10 @@ export const Header: React.FC<HeaderProps> = ({ openModal, setState }) => {
     setLoginModalOpen(false);
   };
 
+  const closeSearchModal = () => {
+    setSearchModalOpen(false);
+  };
+
   const openSignUp = () => {
     setLoginError("");
     setIsSignUp(true);
@@ -207,6 +246,7 @@ export const Header: React.FC<HeaderProps> = ({ openModal, setState }) => {
   };
 
   const login = () => {
+    setSearchText("");
     setIsDisabled(true);
     setLoginError("");
     if (email === "" || password === "") {
@@ -245,7 +285,41 @@ export const Header: React.FC<HeaderProps> = ({ openModal, setState }) => {
 
   const logout = () => {
     setIsLogged("");
+    setSearchText("");
     setState(initialData);
+  };
+
+  const startComposition = () => setComposition(true);
+  const endComposition = () => setComposition(false);
+
+  const search = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !composing) {
+      const tasks = state.tasks;
+
+      let taskStatus: { [key: string]: string } = {};
+      let result: SearchResult[] = [];
+      for (const [columnId, { taskIds }] of Object.entries(state.columns)) {
+        taskIds.forEach((taskId) => {
+          taskStatus[taskId] = columnId;
+        });
+      }
+
+      for (const [taskId, { content }] of Object.entries(tasks)) {
+        let searchContent: string[] = [];
+        let { subTask, ...params } = content;
+        searchContent.push(...Object.values(params));
+        searchContent.push(...subTask);
+        const searchContentStr = searchContent.join(",");
+        if (searchContentStr.includes(seachText)) {
+          result.push({
+            ...tasks[taskId],
+            columnId: taskStatus[taskId],
+          });
+        }
+      }
+      setSearchResult(result);
+      setSearchModalOpen(true);
+    }
   };
 
   return (
@@ -313,7 +387,16 @@ export const Header: React.FC<HeaderProps> = ({ openModal, setState }) => {
         </Nav>
         <RightDiv>
           <SeachWrapper data-tip="検索">
-            <Input type="text" placeholder="検索" enterKeyHint="search" />
+            <Input
+              type="text"
+              placeholder="検索"
+              enterKeyHint="search"
+              value={seachText}
+              onChange={onChangeSearchText}
+              onCompositionStart={startComposition}
+              onCompositionEnd={endComposition}
+              onKeyDown={(e) => search(e)}
+            />
             <SearchIcon />
           </SeachWrapper>
           <IconButtonSearch>
@@ -395,13 +478,58 @@ export const Header: React.FC<HeaderProps> = ({ openModal, setState }) => {
           )}
         </InputWrapper>
       </Modal>
+      <Modal
+        isOpen={searchModalOpen}
+        onRequestClose={closeSearchModal}
+        style={searchModalStyle}
+        contentLabel="検索結果"
+      >
+        {searchResult.length === 0 && <p>No search results</p>}
+        {searchResult.length > 0 && (
+          <>
+            <ModalHeader>検索結果</ModalHeader>
+            <ul>
+              {searchResult.map(({ id, content, columnId }) => (
+                <Result
+                  onClick={() => onClickTask(content, columnId, id)}
+                  key={id}
+                >
+                  <span>{content.title}</span>
+                  <span>{content.toDoDate}</span>
+                  <span>{initialData.columns[columnId].title}</span>
+                </Result>
+              ))}
+            </ul>
+          </>
+        )}
+      </Modal>
     </>
   );
 };
 
-// const ButtonLink = styled.button`
-//   font-size: 14px;
-// `;
+const Result = styled.li`
+  display: flex;
+  justify-content: space-between;
+
+  span:first-child {
+    width: 500px;
+  }
+
+  span:nth-child(2) {
+    width: 100px;
+  }
+
+  span:last-child {
+    width: 100px;
+  }
+
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+    color: ${theme.colors.primaryblue};
+    background-color: ${theme.colors.backgroungHover};
+  }
+`;
 
 const Error = styled.p`
   font-size: 12px;

@@ -8,6 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import ja from "date-fns/locale/ja";
 import { useAutoResizeTextArea } from "../hooks/useAutoResizeTextArea";
 import { UseModalReturn } from "../hooks/useModal";
+import { initialData } from "../data/initial-data";
 
 Modal.setAppElement("#root");
 
@@ -43,6 +44,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({ useModalReturn }) => {
     subTask,
     toDoDate,
     editFlag,
+    editColumnId,
     closeModal,
     onChangeTitle,
     onChangeMemo,
@@ -65,7 +67,14 @@ export const TaskModal: React.FC<TaskModalProps> = ({ useModalReturn }) => {
       style={modalStyle}
       contentLabel="タスクを作成"
     >
-      <ModalHeader>タスクを作成</ModalHeader>
+      <ModalHeader>
+        <span>{editFlag ? "タスクを修正" : "タスクを作成"}</span>
+        {editFlag && (
+          <span className="status">
+            {initialData.columns[editColumnId].title}
+          </span>
+        )}
+      </ModalHeader>
       <CreateTask>
         <Title
           placeholder="タイトル"
@@ -140,8 +149,14 @@ export const TaskModal: React.FC<TaskModalProps> = ({ useModalReturn }) => {
 };
 
 const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
   margin-bottom: 22px;
   font-size: 20px;
+
+  .status {
+    font-size: 14px;
+  }
 `;
 
 const CreateTask = styled.div`
