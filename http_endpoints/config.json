@@ -1,5 +1,16 @@
 [
     {
+        "route": "/update_tasks",
+        "http_method": "POST",
+        "function_name": "updateTasks",
+        "validation_method": "NO_VALIDATION",
+        "respond_result": true,
+        "fetch_custom_user_data": false,
+        "create_user_on_auth": false,
+        "disabled": false,
+        "return_type": "JSON"
+    },
+    {
         "route": "/signup",
         "http_method": "POST",
         "function_name": "signup",
@@ -22,9 +33,9 @@
         "return_type": "JSON"
     },
     {
-        "route": "/update_tasks",
+        "route": "/search",
         "http_method": "POST",
-        "function_name": "updateTasks",
+        "function_name": "search",
         "validation_method": "NO_VALIDATION",
         "respond_result": true,
         "fetch_custom_user_data": false,

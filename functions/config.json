@@ -1,5 +1,11 @@
 [
     {
+        "name": "updateTasks",
+        "private": false,
+        "run_as_system": true,
+        "disable_arg_logs": true
+    },
+    {
         "name": "login",
         "private": false,
         "run_as_system": true,
@@ -12,7 +18,7 @@
         "disable_arg_logs": true
     },
     {
-        "name": "updateTasks",
+        "name": "search",
         "private": false,
         "run_as_system": true,
         "disable_arg_logs": true
