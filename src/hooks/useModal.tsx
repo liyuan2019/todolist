@@ -36,6 +36,7 @@ export const useModal = (
   }
 
   function closeModal() {
+    reset();
     setModalOpen(false);
   }
 
