@@ -70,7 +70,10 @@ export const TaskModal: React.FC<TaskModalProps> = ({ useModalReturn }) => {
       <ModalHeader>
         <span>{editFlag ? "タスクを修正" : "タスクを作成"}</span>
         {editFlag && (
-          <span className="status">
+          <span
+            className="status"
+            data-type={initialData.columns[editColumnId].title}
+          >
             {initialData.columns[editColumnId].title}
           </span>
         )}
@@ -151,11 +154,29 @@ export const TaskModal: React.FC<TaskModalProps> = ({ useModalReturn }) => {
 const ModalHeader = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 22px;
   font-size: 20px;
+  line-height: 1;
 
   .status {
-    font-size: 14px;
+    font-size: 12px;
+    padding: 8px;
+    border-radius: 3px;
+
+    &[data-type="TO DO"] {
+      background-color: #dee1e5;
+    }
+
+    &[data-type="IN PROGRESS"] {
+      color: white;
+      background-color: #eb8906;
+    }
+
+    &[data-type="DONE"] {
+      color: white;
+      background-color: #038859;
+    }
   }
 `;
 
@@ -170,6 +191,8 @@ const CreateTask = styled.div`
 
 const Title = styled.input`
   width: 100%;
+  font-size: 20px;
+  font-weight: 600;
 
   &::placeholder {
     font-style: italic;
@@ -184,6 +207,7 @@ const Memo = styled.textarea`
   resize: none;
   width: 100%;
   margin-top: 10px;
+  font-size: 14px;
 
   &::placeholder {
     font-style: italic;

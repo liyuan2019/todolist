@@ -6,7 +6,7 @@ import { IoIosNotifications, IoIosSettings, IoMdSearch } from "react-icons/io";
 import { BiChevronDown } from "react-icons/bi";
 import { MdAdd } from "react-icons/md";
 import { AiFillQuestionCircle } from "react-icons/ai";
-import { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -55,7 +55,7 @@ type Menu = {
     title: string;
     url: string;
   }[];
-  show: boolean;
+  // show: boolean;
 };
 
 type SearchResult = {
@@ -107,84 +107,94 @@ export const Header: React.FC<HeaderProps> = ({
     setPassword(e.target.value);
   };
 
-  const [menu, setMenu] = useState<Menu[]>([
-    {
-      title: "あなたの作業",
-      subMenu: [
-        { title: "作業1", url: "" },
-        { title: "作業2", url: "" },
-      ],
-      show: true,
-    },
+  const menu: Menu[] = [
     {
       title: "プロジェクト",
       subMenu: [
         { title: "プロジェクト1", url: "" },
         { title: "プロジェクト2", url: "" },
       ],
-      show: true,
     },
-    {
-      title: "フィルター",
-      subMenu: [
-        { title: "フィルター1", url: "" },
-        { title: "フィルター2", url: "" },
-      ],
-      show: true,
-    },
-  ]);
+  ];
 
-  const [detailMenu, setDetailMenu] = useState<{
-    title: string;
-    subMenu: Menu[];
-    show: boolean;
-  }>({
-    title: "詳細",
-    subMenu: [],
-    show: false,
-  });
+  // const [menu, setMenu] = useState<Menu[]>([
+  //   {
+  //     title: "あなたの作業",
+  //     subMenu: [
+  //       { title: "作業1", url: "" },
+  //       { title: "作業2", url: "" },
+  //     ],
+  //     show: true,
+  //   },
+  //   {
+  //     title: "プロジェクト",
+  //     subMenu: [
+  //       { title: "プロジェクト1", url: "" },
+  //       { title: "プロジェクト2", url: "" },
+  //     ],
+  //     show: true,
+  //   },
+  //   {
+  //     title: "フィルター",
+  //     subMenu: [
+  //       { title: "フィルター1", url: "" },
+  //       { title: "フィルター2", url: "" },
+  //     ],
+  //     show: true,
+  //   },
+  // ]);
 
-  const arrangeMenu = useCallback(() => {
-    let detail = detailMenu;
-    let alterMenu = menu;
-    if (window.innerWidth < 760) {
-      detail = {
-        title: "詳細",
-        subMenu: [menu[0], menu[1], menu[2]],
-        show: true,
-      };
-      alterMenu[2].show = false;
-      alterMenu[1].show = false;
-      alterMenu[0].show = false;
-    } else if (window.innerWidth < 918) {
-      detail = {
-        title: "詳細",
-        subMenu: [menu[1], menu[2]],
-        show: true,
-      };
-      alterMenu[2].show = false;
-      alterMenu[1].show = false;
-      alterMenu[0].show = true;
-    } else {
-      detail = {
-        title: "詳細",
-        subMenu: [],
-        show: false,
-      };
-      alterMenu[2].show = true;
-      alterMenu[1].show = true;
-      alterMenu[0].show = true;
-    }
-    setDetailMenu(detail);
-    setMenu(alterMenu);
-  }, [detailMenu, menu]);
+  // const [detailMenu, setDetailMenu] = useState<{
+  //   title: string;
+  //   subMenu: Menu[];
+  //   show: boolean;
+  // }>({
+  //   title: "詳細",
+  //   subMenu: [],
+  //   show: false,
+  // });
 
-  window.onresize = arrangeMenu;
+  // const arrangeMenu = useCallback(() => {
+  //   let detail = detailMenu;
+  //   let alterMenu = menu;
+  //   if (window.innerWidth < 760) {
+  //     detail = {
+  //       title: "詳細",
+  //       subMenu: [menu[0], menu[1], menu[2]],
+  //       show: true,
+  //     };
+  //     alterMenu[2].show = false;
+  //     alterMenu[1].show = false;
+  //     alterMenu[0].show = false;
+  //   } else if (window.innerWidth < 918) {
+  //     detail = {
+  //       title: "詳細",
+  //       subMenu: [menu[1], menu[2]],
+  //       show: true,
+  //     };
+  //     alterMenu[2].show = false;
+  //     alterMenu[1].show = false;
+  //     alterMenu[0].show = true;
+  //   } else {
+  //     detail = {
+  //       title: "詳細",
+  //       subMenu: [],
+  //       show: false,
+  //     };
+  //     alterMenu[2].show = true;
+  //     alterMenu[1].show = true;
+  //     alterMenu[0].show = true;
+  //   }
+  //   setDetailMenu(detail);
+  //   setMenu(alterMenu);
+  // }, [detailMenu, menu]);
 
-  useEffect(() => {
-    arrangeMenu();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // window.onresize = arrangeMenu;
+
+  // useEffect(() => {
+  //   arrangeMenu();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   const openLoginModal = () => {
     setIsSignUp(false);
@@ -332,26 +342,23 @@ export const Header: React.FC<HeaderProps> = ({
             ToDo
           </LogoLink>
           <MenuBar>
-            {menu.map(
-              ({ title, subMenu, show }, i) =>
-                show && (
-                  <Dropdown as={ButtonWrapper} key={title}>
-                    <Dropdown.Toggle as={MenuButton}>
-                      <span>{title}</span>
-                      <BiChevronDown size={16} color="#97A1AF" />
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-                      {subMenu.length > 0 &&
-                        subMenu.map(({ title, url }) => (
-                          <Dropdown.Item href={url} key={title}>
-                            {title}
-                          </Dropdown.Item>
-                        ))}
-                    </Dropdown.Menu>
-                  </Dropdown>
-                )
-            )}
-            {detailMenu.show && (
+            {menu.map(({ title, subMenu }, i) => (
+              <Dropdown as={ButtonWrapper} key={title}>
+                <Dropdown.Toggle as={MenuButton}>
+                  <span>{title}</span>
+                  <BiChevronDown size={16} color="#97A1AF" />
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  {subMenu.length > 0 &&
+                    subMenu.map(({ title, url }) => (
+                      <Dropdown.Item href={url} key={title}>
+                        {title}
+                      </Dropdown.Item>
+                    ))}
+                </Dropdown.Menu>
+              </Dropdown>
+            ))}
+            {/* {detailMenu.show && (
               <Dropdown as={ButtonWrapper}>
                 <Dropdown.Toggle as={MenuButton}>
                   <span>{detailMenu.title}</span>
@@ -377,7 +384,7 @@ export const Header: React.FC<HeaderProps> = ({
                     ))}
                 </Dropdown.Menu>
               </Dropdown>
-            )}
+            )} */}
           </MenuBar>
           <CreateButton onClick={openModal}>
             <Txt>作成</Txt>
@@ -495,8 +502,20 @@ export const Header: React.FC<HeaderProps> = ({
                   key={id}
                 >
                   <span>{content.title}</span>
-                  <span>{content.toDoDate}</span>
-                  <span>{initialData.columns[columnId].title}</span>
+                  <span
+                    className="date"
+                    data-is-expired={
+                      new Date(content.toDoDate) <
+                      new Date(new Date().toLocaleDateString())
+                    }
+                  >
+                    {content.toDoDate}
+                  </span>
+                  <div className="status">
+                    <span data-type={initialData.columns[columnId].title}>
+                      {initialData.columns[columnId].title}
+                    </span>
+                  </div>
                 </Result>
               ))}
             </ul>
@@ -510,6 +529,9 @@ export const Header: React.FC<HeaderProps> = ({
 const Result = styled.li`
   display: flex;
   justify-content: space-between;
+  line-height: 1;
+  align-items: center;
+  padding: 8px;
 
   span:first-child {
     width: 500px;
@@ -519,14 +541,40 @@ const Result = styled.li`
     width: 100px;
   }
 
-  span:last-child {
+  .date {
+    &[data-is-expired="true"] {
+      color: red;
+    }
+  }
+
+  .status {
     width: 100px;
+    font-size: 12px;
+
+    span {
+      padding: 3px;
+      border-radius: 3px;
+    }
+
+    span[data-type="TO DO"] {
+      background-color: #dee1e5;
+    }
+
+    span[data-type="IN PROGRESS"] {
+      color: white;
+      background-color: #eb8906;
+    }
+
+    span[data-type="DONE"] {
+      color: white;
+      background-color: #038859;
+    }
   }
 
   &:hover {
-    text-decoration: underline;
+    /* text-decoration: underline; */
     cursor: pointer;
-    color: ${theme.colors.primaryblue};
+    /* color: ${theme.colors.primaryblue}; */
     background-color: ${theme.colors.backgroungHover};
   }
 `;
