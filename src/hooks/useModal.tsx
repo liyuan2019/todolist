@@ -1,4 +1,4 @@
-import { Board, ToDo } from "@/type";
+import { Board, ToDo, Priority } from "../type";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useToDoList } from "./useToDoList";
 
@@ -14,6 +14,7 @@ export const useModal = (
     memo: "",
     subTask: [],
     toDoDate: today,
+    priority: "medium",
   });
 
   const [title, setTitle] = useState<string>("");
@@ -23,13 +24,15 @@ export const useModal = (
   const [editFlag, setEditFlag] = useState<boolean>(false);
   const [editTaskId, setEditTaskId] = useState<string>("");
   const [editColumnId, setEditColumnId] = useState<string>("");
+  const [priority, setPriority] = useState<Priority>("medium");
 
   useEffect(() => {
     setTitle(todo.title);
     setMemo(todo.memo);
     setTodoDate(todo.toDoDate);
     setSubTask(todo.subTask);
-  }, [todo.title, todo.memo, todo.toDoDate, todo.subTask]);
+    setPriority(todo.priority);
+  }, [todo.title, todo.memo, todo.toDoDate, todo.subTask, todo.priority]);
 
   function openModal() {
     setModalOpen(true);
@@ -54,6 +57,13 @@ export const useModal = (
     setSubTask(subTaskAll);
   };
 
+  const onChangePriority = (
+    // e: MouseEvent<HTMLElement, MouseEvent>,
+    prioriry: Priority
+  ) => {
+    setPriority(prioriry);
+  };
+
   const reset = () => {
     setTitle("");
     setMemo("");
@@ -64,6 +74,7 @@ export const useModal = (
       memo: "",
       subTask: [],
       toDoDate: new Date().toLocaleDateString(),
+      priority: "medium",
     });
     setEditFlag(false);
     setEditTaskId("");
@@ -86,6 +97,7 @@ export const useModal = (
       memo,
       subTask: subTask.filter((v) => v !== ""),
       toDoDate,
+      priority,
     };
     addTodo(toDoList);
     reset();
@@ -111,6 +123,7 @@ export const useModal = (
       memo,
       subTask: subTask.filter((v) => v !== ""),
       toDoDate,
+      priority,
     };
     editTodo(toDoList, editTaskId);
     reset();
@@ -130,6 +143,7 @@ export const useModal = (
     memo,
     subTask,
     toDoDate,
+    priority,
     editFlag,
     editColumnId,
     openModal,
@@ -137,6 +151,7 @@ export const useModal = (
     onChangeTitle,
     onChangeMemo,
     onChangeSubTask,
+    onChangePriority,
     onClickSubTaskAdd,
     setTodoDate,
     onClickTask,

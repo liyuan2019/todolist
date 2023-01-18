@@ -1,8 +1,19 @@
+export type Priority =
+  | "highest"
+  | "high"
+  | "medium"
+  | "low"
+  | "lowest"
+  | "none";
+// export type Priority = "最高" | "高" | "中" | "低" | "最低" | "未設定";
+
 export type ToDo = {
   title: string;
   memo: string;
   subTask: string[];
   toDoDate: string;
+  priority: Priority;
+  // priority: "最高" | "高" | "中" | "低" | "最低" | "未設定";
 };
 
 export type ToDoColumn = {

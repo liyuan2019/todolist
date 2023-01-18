@@ -1,4 +1,4 @@
-import { Board, ToDo } from "@/type";
+import { Board, ToDo } from "../type";
 import lodash from "lodash";
 import { useCallback } from "react";
 import { useUpdateTasks } from "./useUpdateTasks";

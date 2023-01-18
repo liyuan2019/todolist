@@ -8,7 +8,9 @@ import "react-datepicker/dist/react-datepicker.css";
 import ja from "date-fns/locale/ja";
 import { useAutoResizeTextArea } from "../hooks/useAutoResizeTextArea";
 import { UseModalReturn } from "../hooks/useModal";
-import { initialData } from "../data/initial-data";
+import { initialData, priorities } from "../data/initial-data";
+import { Dropdown } from "react-bootstrap";
+import { BiChevronDown } from "react-icons/bi";
 
 Modal.setAppElement("#root");
 
@@ -43,6 +45,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({ useModalReturn }) => {
     memo,
     subTask,
     toDoDate,
+    priority,
     editFlag,
     editColumnId,
     closeModal,
@@ -50,6 +53,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({ useModalReturn }) => {
     onChangeMemo,
     onChangeSubTask,
     onClickSubTaskAdd,
+    onChangePriority,
     setTodoDate,
     onClickCancel,
     onClickAdd,
@@ -111,24 +115,81 @@ export const TaskModal: React.FC<TaskModalProps> = ({ useModalReturn }) => {
           <HiPlus color={theme.colors.primaryblue} />
           <span>サブタスクを追加</span>
         </SubtaskCreateButton>
-        <TaskDate>
-          <RiCalendarTodoFill color={theme.colors.primaryblue} />
-          <div>
-            <DatePicker
-              popperPlacement="right-start"
-              className="date-picker"
-              selected={new Date(toDoDate)}
-              onChange={(date) =>
-                setTodoDate(date ? date.toLocaleDateString() : "")
+        <Others>
+          <TaskDate>
+            <RiCalendarTodoFill color={theme.colors.primaryblue} />
+            <div
+              data-is-expired={
+                new Date(toDoDate) < new Date(new Date().toLocaleDateString())
               }
-              locale="ja"
-              dateFormat="yyyy/MM/dd"
-              minDate={today}
-              dateFormatCalendar={"yyyy年 MM月"}
-            />
-          </div>
-        </TaskDate>
+            >
+              <DatePicker
+                popperPlacement="right-start"
+                className="date-picker"
+                selected={new Date(toDoDate)}
+                onChange={(date) =>
+                  setTodoDate(date ? date.toLocaleDateString() : "")
+                }
+                locale="ja"
+                dateFormat="yyyy/MM/dd"
+                minDate={today}
+                dateFormatCalendar={"yyyy年 MM月"}
+              />
+            </div>
+          </TaskDate>
+          <TaskPriority>
+            <label>優先度</label>
+            {/* <select
+              name="priority"
+              value={priority}
+              onChange={onChangePriority}
+            >
+              {priorities.map((priority, i) => (
+                <option
+                  value={priority}
+                  className={"priority" + i}
+                  key={priority}
+                >
+                  {priority}
+                </option>
+              ))}
+            </select> */}
+            <Dropdown as={ButtonWrapper} drop="end">
+              <Dropdown.Toggle as={MenuButton}>
+                <Option>
+                  <img
+                    src={
+                      priorities.filter((p) => p.priority === priority)[0]
+                        .imgPath
+                    }
+                    alt=""
+                    width={20}
+                    height={20}
+                  />
+                  <span>
+                    {priorities.filter((p) => p.priority === priority)[0].text}
+                  </span>
+                  <BiChevronDown size={16} color="#97A1AF" />
+                </Option>
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                {priorities
+                  .filter((p) => p.priority !== priority)
+                  .map(({ priority, text, imgPath }) => (
+                    <Dropdown.Item
+                      onClick={(e) => onChangePriority(priority)}
+                      key={priority}
+                    >
+                      <img src={imgPath} alt="" width={20} height={20} />
+                      {text}
+                    </Dropdown.Item>
+                  ))}
+              </Dropdown.Menu>
+            </Dropdown>
+          </TaskPriority>
+        </Others>
       </CreateTask>
+
       <ModalFooter>
         {editFlag && <DeleteButton onClick={onClickDelete}>削除</DeleteButton>}
         <Button onClick={onClickCancel}>キャンセル</Button>
@@ -243,6 +304,19 @@ const Subtask = styled.ul`
   }
 `;
 
+const ButtonWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  position: relative;
+
+  .dropdown-toggle::after {
+    display: none;
+  }
+`;
+
 const MenuButton = styled.button`
   display: inline-flex;
   cursor: pointer;
@@ -267,13 +341,26 @@ const SubtaskCreateButton = styled(MenuButton)`
   padding: 0px 5px;
 `;
 
+const Others = styled.div`
+  display: flex;
+  align-items: center;
+  /* justify-content: center; */
+  gap: 40px;
+  margin-top: 10px;
+`;
+
 const TaskDate = styled.div`
   display: flex;
   align-items: center;
   gap: 5px;
   line-height: 32px;
-  padding: 0px 5px;
-  margin-top: 10px;
+  /* padding: 0px 5px; */
+
+  div[data-is-expired="true"] {
+    .date-picker {
+      color: red;
+    }
+  }
 
   .date-picker {
     background-color: ${theme.colors.backgroundInput};
@@ -287,6 +374,57 @@ const TaskDate = styled.div`
       outline: none;
     }
   }
+`;
+
+const TaskPriority = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  .dropend {
+    background-color: ${theme.colors.backgroundInput};
+  }
+
+  img {
+    margin-right: 5px;
+  }
+
+  /* option {
+    height: 25px;
+    text-align: center;
+    background-size: 15px;
+    background-repeat: no-repeat;
+    background-position: 5px 2px;
+  }
+
+  .priority0 {
+    background-image: url("/images/icons/priorities/highest.svg");
+  }
+
+  .priority1 {
+    background-image: url("/images/icons/priorities/high.svg");
+  }
+
+  .priority2 {
+    background-image: url("/images/icons/priorities/medium.svg");
+  }
+
+  .priority3 {
+    background-image: url("/images/icons/priorities/low.svg");
+  }
+
+  .priority4 {
+    background-image: url("/images/icons/priorities/lowest.svg");
+  }
+
+  .priority5 {
+    background-image: url("/images/icons/priorities/none.svg");
+  } */
+`;
+
+const Option = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
 const ModalFooter = styled.div`

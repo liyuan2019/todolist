@@ -1,8 +1,9 @@
 import { theme } from "../styles/theme";
-import { ToDo, ToDoTask } from "@/type";
+import { ToDo, ToDoTask } from "../type";
 import { Draggable } from "react-beautiful-dnd";
 import styled from "styled-components";
 import { CgCalendarDue } from "react-icons/cg";
+import { priorities } from "../data/initial-data";
 // import { AiOutlineCloseCircle } from "react-icons/ai";
 
 type TaskProps = {
@@ -41,17 +42,31 @@ export const Task: React.FC<TaskProps> = ({
           </Title> */}
           <Title>{task.content.title}</Title>
           <Memo>{task.content.memo}</Memo>
-          {task.content.toDoDate && (
-            <ScheduledDate
-              isExpired={
-                new Date(task.content.toDoDate) <
-                new Date(new Date().toLocaleDateString())
-              }
-            >
-              <CgCalendarDue />
-              <span>{task.content.toDoDate}</span>
-            </ScheduledDate>
-          )}
+          <Others>
+            {task.content.toDoDate && (
+              <ScheduledDate
+                isExpired={
+                  new Date(task.content.toDoDate) <
+                  new Date(new Date().toLocaleDateString())
+                }
+              >
+                <CgCalendarDue />
+                <span>{task.content.toDoDate}</span>
+              </ScheduledDate>
+            )}
+            <Priority>
+              <img
+                src={
+                  priorities.filter(
+                    (p) => p.priority === task.content.priority
+                  )[0].imgPath
+                }
+                alt=""
+                width={20}
+                height={20}
+              />
+            </Priority>
+          </Others>
         </Container>
       )}
     </Draggable>
@@ -109,4 +124,15 @@ const ScheduledDate = styled.div<{ isExpired: boolean }>`
     margin-left: 2px;
     color: ${({ isExpired }) => (isExpired ? "red" : "inherit")};
   }
+`;
+
+const Others = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const Priority = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
 `;

@@ -3,7 +3,7 @@ import { theme } from "../styles/theme";
 import { ReactNode } from "react";
 import styled, { ThemeProvider } from "styled-components";
 import { Header } from "./Header";
-import { Board, ToDo } from "@/type";
+import { Board, ToDo } from "../type";
 
 type LayoutProps = {
   children: ReactNode;

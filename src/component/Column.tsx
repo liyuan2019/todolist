@@ -1,5 +1,5 @@
 import { theme } from "../styles/theme";
-import { ToDo, ToDoColumn, ToDoTask } from "@/type";
+import { ToDo, ToDoColumn, ToDoTask } from "../type";
 import { Droppable } from "react-beautiful-dnd";
 import styled from "styled-components";
 import { Task } from "./Task";

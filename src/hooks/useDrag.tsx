@@ -1,7 +1,7 @@
 import { initialData } from "../data/initial-data";
 import { useState } from "react";
 import { DropResult } from "react-beautiful-dnd";
-import { Board } from "@/type";
+import { Board } from "../type";
 import { useUpdateTasks } from "./useUpdateTasks";
 
 export const useDrag = () => {
