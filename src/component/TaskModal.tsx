@@ -11,6 +11,7 @@ import { UseModalReturn } from "../hooks/useModal";
 import { initialData, priorities } from "../data/initial-data";
 import { Dropdown } from "react-bootstrap";
 import { BiChevronDown } from "react-icons/bi";
+import { AiOutlinePlus } from "react-icons/ai";
 
 Modal.setAppElement("#root");
 
@@ -137,6 +138,30 @@ export const TaskModal: React.FC<TaskModalProps> = ({ useModalReturn }) => {
               />
             </div>
           </TaskDate>
+          <TaskProject>
+            <label>プロジェクト</label>
+            <Dropdown as={ButtonWrapper} drop="up">
+              <Dropdown.Toggle as={MenuButton}>
+                <Option>
+                  <span>未分類</span>
+                  <BiChevronDown size={16} color="#97A1AF" />
+                </Option>
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item>
+                  <Option>
+                    <span>未分類</span>
+                  </Option>
+                </Dropdown.Item>
+                <Dropdown.Item>
+                  <Option>
+                    <AiOutlinePlus color="green" size={18} />
+                    <span>プロジェクト作成</span>
+                  </Option>
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </TaskProject>
           <TaskPriority>
             <label>優先度</label>
             {/* <select
@@ -180,8 +205,10 @@ export const TaskModal: React.FC<TaskModalProps> = ({ useModalReturn }) => {
                       onClick={(e) => onChangePriority(priority)}
                       key={priority}
                     >
-                      <img src={imgPath} alt="" width={20} height={20} />
-                      {text}
+                      <Option>
+                        <img src={imgPath} alt="" width={20} height={20} />
+                        <span>{text}</span>
+                      </Option>
                     </Dropdown.Item>
                   ))}
               </Dropdown.Menu>
@@ -189,7 +216,6 @@ export const TaskModal: React.FC<TaskModalProps> = ({ useModalReturn }) => {
           </TaskPriority>
         </Others>
       </CreateTask>
-
       <ModalFooter>
         {editFlag && <DeleteButton onClick={onClickDelete}>削除</DeleteButton>}
         <Button onClick={onClickCancel}>キャンセル</Button>
@@ -376,6 +402,16 @@ const TaskDate = styled.div`
   }
 `;
 
+const TaskProject = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  .dropup {
+    background-color: ${theme.colors.backgroundInput};
+  }
+`;
+
 const TaskPriority = styled.div`
   display: flex;
   gap: 10px;
@@ -383,10 +419,6 @@ const TaskPriority = styled.div`
 
   .dropend {
     background-color: ${theme.colors.backgroundInput};
-  }
-
-  img {
-    margin-right: 5px;
   }
 
   /* option {
@@ -425,6 +457,11 @@ const TaskPriority = styled.div`
 const Option = styled.div`
   display: flex;
   align-items: center;
+
+  img,
+  svg {
+    margin-right: 5px;
+  }
 `;
 
 const ModalFooter = styled.div`
