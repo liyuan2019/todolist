@@ -15,6 +15,7 @@ export const useModal = (
     subTask: [],
     toDoDate: today,
     priority: "medium",
+    projectName: "未分類",
   });
 
   const [title, setTitle] = useState<string>("");
@@ -25,6 +26,7 @@ export const useModal = (
   const [editTaskId, setEditTaskId] = useState<string>("");
   const [editColumnId, setEditColumnId] = useState<string>("");
   const [priority, setPriority] = useState<Priority>("medium");
+  const [projectName, setProjectName] = useState<string>("未分類");
 
   useEffect(() => {
     setTitle(todo.title);
@@ -32,7 +34,15 @@ export const useModal = (
     setTodoDate(todo.toDoDate);
     setSubTask(todo.subTask);
     setPriority(todo.priority);
-  }, [todo.title, todo.memo, todo.toDoDate, todo.subTask, todo.priority]);
+    setProjectName(todo.projectName);
+  }, [
+    todo.title,
+    todo.memo,
+    todo.toDoDate,
+    todo.subTask,
+    todo.priority,
+    todo.projectName,
+  ]);
 
   function openModal() {
     setModalOpen(true);
@@ -64,17 +74,24 @@ export const useModal = (
     setPriority(prioriry);
   };
 
+  const onChangeProjectName = (project: string) => {
+    setProjectName(project);
+  };
+
   const reset = () => {
     setTitle("");
     setMemo("");
     setTodoDate(today);
     setSubTask([]);
+    setPriority("medium");
+    setProjectName("未分類");
     setTodo({
       title: "",
       memo: "",
       subTask: [],
       toDoDate: new Date().toLocaleDateString(),
       priority: "medium",
+      projectName: "未分類",
     });
     setEditFlag(false);
     setEditTaskId("");
@@ -98,6 +115,7 @@ export const useModal = (
       subTask: subTask.filter((v) => v !== ""),
       toDoDate,
       priority,
+      projectName,
     };
     addTodo(toDoList);
     reset();
@@ -124,6 +142,7 @@ export const useModal = (
       subTask: subTask.filter((v) => v !== ""),
       toDoDate,
       priority,
+      projectName,
     };
     editTodo(toDoList, editTaskId);
     reset();
@@ -144,6 +163,7 @@ export const useModal = (
     subTask,
     toDoDate,
     priority,
+    projectName,
     editFlag,
     editColumnId,
     openModal,
@@ -152,6 +172,7 @@ export const useModal = (
     onChangeMemo,
     onChangeSubTask,
     onChangePriority,
+    onChangeProjectName,
     onClickSubTaskAdd,
     setTodoDate,
     onClickTask,

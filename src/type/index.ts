@@ -7,12 +7,19 @@ export type Priority =
   | "none";
 // export type Priority = "最高" | "高" | "中" | "低" | "最低" | "未設定";
 
+export type Project = {
+  name: string;
+  introduction: string;
+  color: string;
+};
+
 export type ToDo = {
   title: string;
   memo: string;
   subTask: string[];
   toDoDate: string;
   priority: Priority;
+  projectName: string;
   // priority: "最高" | "高" | "中" | "低" | "最低" | "未設定";
 };
 
@@ -33,4 +40,5 @@ export type Board = {
   count: number;
   columns: { [key: string]: ToDoColumn };
   columnOrder: string[];
+  projects: Project[];
 };

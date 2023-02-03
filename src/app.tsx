@@ -6,11 +6,15 @@ import { Layout } from "./component/Layout";
 import { useDrag } from "./hooks/useDrag";
 import { useModal } from "./hooks/useModal";
 import { TaskModal } from "./component/TaskModal";
+import { ProjectModal } from "./component/ProjectModal";
+import { useProjectModal } from "./hooks/useProjectModal";
 
 export const App: React.FC = () => {
   const { state, setState, onDragEnd } = useDrag();
   const useModalReturn = useModal(state, setState);
+  const useProjectModalReturn = useProjectModal(state, setState);
   const { openModal, onClickTask } = useModalReturn;
+  const { openProjectModal } = useProjectModalReturn;
 
   return (
     <Layout
@@ -19,7 +23,12 @@ export const App: React.FC = () => {
       setState={setState}
       onClickTask={onClickTask}
     >
-      <TaskModal useModalReturn={useModalReturn} />
+      <TaskModal
+        useModalReturn={useModalReturn}
+        projects={state.projects.map((p) => p.name)}
+        openProjectModal={openProjectModal}
+      />
+      <ProjectModal useProjectModalReturn={useProjectModalReturn} />
       <DragDropContext onDragEnd={onDragEnd}>
         <Container>
           {state.columnOrder.map((columnId) => {

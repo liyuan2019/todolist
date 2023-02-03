@@ -34,9 +34,15 @@ const modalStyle = {
 
 type TaskModalProps = {
   useModalReturn: UseModalReturn;
+  projects: string[];
+  openProjectModal: () => void;
 };
 
-export const TaskModal: React.FC<TaskModalProps> = ({ useModalReturn }) => {
+export const TaskModal: React.FC<TaskModalProps> = ({
+  useModalReturn,
+  projects,
+  openProjectModal,
+}) => {
   registerLocale("ja", ja);
   const today = new Date();
 
@@ -47,6 +53,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({ useModalReturn }) => {
     subTask,
     toDoDate,
     priority,
+    projectName,
     editFlag,
     editColumnId,
     closeModal,
@@ -55,6 +62,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({ useModalReturn }) => {
     onChangeSubTask,
     onClickSubTaskAdd,
     onChangePriority,
+    onChangeProjectName,
     setTodoDate,
     onClickCancel,
     onClickAdd,
@@ -64,107 +72,115 @@ export const TaskModal: React.FC<TaskModalProps> = ({ useModalReturn }) => {
 
   const textAreaRef = useAutoResizeTextArea(memo);
 
+  // const [projectModalOpen, setProjectModalOpen] = useState<boolean>(false);
+
   return (
-    <Modal
-      isOpen={modalOpen}
-      // onAfterOpen={afterOpenModal}
-      onRequestClose={closeModal}
-      style={modalStyle}
-      contentLabel="タスクを作成"
-    >
-      <ModalHeader>
-        <span>{editFlag ? "タスクを修正" : "タスクを作成"}</span>
-        {editFlag && (
-          <span
-            className="status"
-            data-type={initialData.columns[editColumnId].title}
-          >
-            {initialData.columns[editColumnId].title}
-          </span>
-        )}
-      </ModalHeader>
-      <CreateTask>
-        <Title
-          placeholder="タイトル"
-          type="text"
-          value={title}
-          onChange={onChangeTitle}
-        />
-        <Memo
-          placeholder="メモ"
-          value={memo}
-          onChange={onChangeMemo}
-          ref={textAreaRef}
-        ></Memo>
-        <Subtask>
-          {subTask.map(
-            (sub, index) =>
-              sub !== null && (
-                <li key={`subtask_${index}`}>
-                  <input
-                    placeholder="サブタスク"
-                    type="text"
-                    value={sub}
-                    onChange={(e) => onChangeSubTask(e, index)}
-                    autoFocus={index === subTask.length - 1 ? true : false}
-                  ></input>
-                </li>
-              )
-          )}
-        </Subtask>
-        <SubtaskCreateButton id="subTaskAdd" onClick={onClickSubTaskAdd}>
-          <HiPlus color={theme.colors.primaryblue} />
-          <span>サブタスクを追加</span>
-        </SubtaskCreateButton>
-        <Others>
-          <TaskDate>
-            <RiCalendarTodoFill color={theme.colors.primaryblue} />
-            <div
-              data-is-expired={
-                new Date(toDoDate) < new Date(new Date().toLocaleDateString())
-              }
+    <>
+      <Modal
+        isOpen={modalOpen}
+        // onAfterOpen={afterOpenModal}
+        onRequestClose={closeModal}
+        style={modalStyle}
+        contentLabel="タスクを作成"
+      >
+        <ModalHeader>
+          <span>{editFlag ? "タスクを修正" : "タスクを作成"}</span>
+          {editFlag && (
+            <span
+              className="status"
+              data-type={initialData.columns[editColumnId].title}
             >
-              <DatePicker
-                popperPlacement="right-start"
-                className="date-picker"
-                selected={new Date(toDoDate)}
-                onChange={(date) =>
-                  setTodoDate(date ? date.toLocaleDateString() : "")
+              {initialData.columns[editColumnId].title}
+            </span>
+          )}
+        </ModalHeader>
+        <CreateTask>
+          <Title
+            placeholder="タイトル"
+            type="text"
+            value={title}
+            onChange={onChangeTitle}
+          />
+          <Memo
+            placeholder="メモ"
+            value={memo}
+            onChange={onChangeMemo}
+            ref={textAreaRef}
+          ></Memo>
+          <Subtask>
+            {subTask.map(
+              (sub, index) =>
+                sub !== null && (
+                  <li key={`subtask_${index}`}>
+                    <input
+                      placeholder="サブタスク"
+                      type="text"
+                      value={sub}
+                      onChange={(e) => onChangeSubTask(e, index)}
+                      autoFocus={index === subTask.length - 1 ? true : false}
+                    ></input>
+                  </li>
+                )
+            )}
+          </Subtask>
+          <SubtaskCreateButton id="subTaskAdd" onClick={onClickSubTaskAdd}>
+            <HiPlus color={theme.colors.primaryblue} />
+            <span>サブタスクを追加</span>
+          </SubtaskCreateButton>
+          <Others>
+            <TaskDate>
+              <RiCalendarTodoFill color={theme.colors.primaryblue} />
+              <div
+                data-is-expired={
+                  new Date(toDoDate) < new Date(new Date().toLocaleDateString())
                 }
-                locale="ja"
-                dateFormat="yyyy/MM/dd"
-                minDate={today}
-                dateFormatCalendar={"yyyy年 MM月"}
-              />
-            </div>
-          </TaskDate>
-          <TaskProject>
-            <label>プロジェクト</label>
-            <Dropdown as={ButtonWrapper} drop="up">
-              <Dropdown.Toggle as={MenuButton}>
-                <Option>
-                  <span>未分類</span>
-                  <BiChevronDown size={16} color="#97A1AF" />
-                </Option>
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <Dropdown.Item>
+              >
+                <DatePicker
+                  popperPlacement="right-start"
+                  className="date-picker"
+                  selected={new Date(toDoDate)}
+                  onChange={(date) =>
+                    setTodoDate(date ? date.toLocaleDateString() : "")
+                  }
+                  locale="ja"
+                  dateFormat="yyyy/MM/dd"
+                  minDate={today}
+                  dateFormatCalendar={"yyyy年 MM月"}
+                />
+              </div>
+            </TaskDate>
+            <TaskProject>
+              <label>プロジェクト</label>
+              <Dropdown as={ButtonWrapper} drop="up" id="project">
+                <Dropdown.Toggle as={MenuButton}>
                   <Option>
-                    <span>未分類</span>
+                    <span>{projectName}</span>
+                    <BiChevronDown size={16} color="#97A1AF" />
                   </Option>
-                </Dropdown.Item>
-                <Dropdown.Item>
-                  <Option>
-                    <AiOutlinePlus color="green" size={18} />
-                    <span>プロジェクト作成</span>
-                  </Option>
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-          </TaskProject>
-          <TaskPriority>
-            <label>優先度</label>
-            {/* <select
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  {projects.map((p) => (
+                    <Dropdown.Item
+                      key={p}
+                      onClick={(e) => onChangeProjectName(p)}
+                    >
+                      <Option>
+                        <span>{p}</span>
+                      </Option>
+                    </Dropdown.Item>
+                  ))}
+                  <Dropdown.Item onClick={(e) => openProjectModal()}>
+                    <Option>
+                      <AiOutlinePlus color="green" size={18} />
+                      <span>プロジェクト追加</span>
+                    </Option>
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            </TaskProject>
+            <TaskPriority>
+              <label>優先度</label>
+              {/* <select
               name="priority"
               value={priority}
               onChange={onChangePriority}
@@ -179,62 +195,68 @@ export const TaskModal: React.FC<TaskModalProps> = ({ useModalReturn }) => {
                 </option>
               ))}
             </select> */}
-            <Dropdown as={ButtonWrapper} drop="end">
-              <Dropdown.Toggle as={MenuButton}>
-                <Option>
-                  <img
-                    src={
-                      priorities.filter((p) => p.priority === priority)[0]
-                        .imgPath
-                    }
-                    alt=""
-                    width={20}
-                    height={20}
-                  />
-                  <span>
-                    {priorities.filter((p) => p.priority === priority)[0].text}
-                  </span>
-                  <BiChevronDown size={16} color="#97A1AF" />
-                </Option>
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                {priorities
-                  .filter((p) => p.priority !== priority)
-                  .map(({ priority, text, imgPath }) => (
-                    <Dropdown.Item
-                      onClick={(e) => onChangePriority(priority)}
-                      key={priority}
-                    >
-                      <Option>
-                        <img src={imgPath} alt="" width={20} height={20} />
-                        <span>{text}</span>
-                      </Option>
-                    </Dropdown.Item>
-                  ))}
-              </Dropdown.Menu>
-            </Dropdown>
-          </TaskPriority>
-        </Others>
-      </CreateTask>
-      <ModalFooter>
-        {editFlag && <DeleteButton onClick={onClickDelete}>削除</DeleteButton>}
-        <Button onClick={onClickCancel}>キャンセル</Button>
-        <CreateButton
-          editFlag={editFlag}
-          disabled={title === ""}
-          onClick={onClickAdd}
-        >
-          作成
-        </CreateButton>
-        <EditButton
-          editFlag={editFlag}
-          disabled={title === ""}
-          onClick={onClickEdit}
-        >
-          修正
-        </EditButton>
-      </ModalFooter>
-    </Modal>
+              <Dropdown as={ButtonWrapper} drop="end">
+                <Dropdown.Toggle as={MenuButton}>
+                  <Option>
+                    <img
+                      src={
+                        priorities.filter((p) => p.priority === priority)[0]
+                          .imgPath
+                      }
+                      alt=""
+                      width={20}
+                      height={20}
+                    />
+                    <span>
+                      {
+                        priorities.filter((p) => p.priority === priority)[0]
+                          .text
+                      }
+                    </span>
+                    <BiChevronDown size={16} color="#97A1AF" />
+                  </Option>
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  {priorities
+                    .filter((p) => p.priority !== priority)
+                    .map(({ priority, text, imgPath }) => (
+                      <Dropdown.Item
+                        onClick={(e) => onChangePriority(priority)}
+                        key={priority}
+                      >
+                        <Option>
+                          <img src={imgPath} alt="" width={20} height={20} />
+                          <span>{text}</span>
+                        </Option>
+                      </Dropdown.Item>
+                    ))}
+                </Dropdown.Menu>
+              </Dropdown>
+            </TaskPriority>
+          </Others>
+        </CreateTask>
+        <ModalFooter>
+          {editFlag && (
+            <DeleteButton onClick={onClickDelete}>削除</DeleteButton>
+          )}
+          <Button onClick={onClickCancel}>キャンセル</Button>
+          <CreateButton
+            editFlag={editFlag}
+            disabled={title === ""}
+            onClick={onClickAdd}
+          >
+            作成
+          </CreateButton>
+          <EditButton
+            editFlag={editFlag}
+            disabled={title === ""}
+            onClick={onClickEdit}
+          >
+            修正
+          </EditButton>
+        </ModalFooter>
+      </Modal>
+    </>
   );
 };
 
@@ -243,7 +265,8 @@ const ModalHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 22px;
-  font-size: 20px;
+  font-size: 24px;
+  font-weight: 600;
   line-height: 1;
 
   .status {
