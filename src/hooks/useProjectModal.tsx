@@ -7,9 +7,6 @@ export const useProjectModal = (
   state: Board,
   setState: React.Dispatch<React.SetStateAction<Board>>
 ) => {
-  //   const today = new Date().toLocaleDateString();
-  //   const [modalOpen, setModalOpen] = useState(false);
-  //   const { addTodo, editTodo, deleteTodo } = useToDoList(state, setState);
   const [project, setProject] = useState<Project>({
     name: "",
     introduction: "",
@@ -19,7 +16,8 @@ export const useProjectModal = (
   const [introduction, setIntroduction] = useState<string>("");
   const [color, setColor] = useState<string>("#f44336");
   const [projectEditFlag, setProjectEditFlag] = useState<boolean>(false);
-  const [projectEditIndex, setProjectEditIndex] = useState<number>(-1);
+  const [projectEditName, setProjectEditName] = useState<string>("");
+  const [projectFilterName, setProjectFilterName] = useState<string>("");
   const [projectModalOpen, setProjectModalOpen] = useState<boolean>(false);
 
   const { updateTasks } = useUpdateTasks();
@@ -65,7 +63,7 @@ export const useProjectModal = (
   const addProject = useCallback(
     (project: Project) => {
       const newState = lodash.cloneDeep(state);
-      newState.projects.push(project);
+      newState.projects.unshift(project);
       setState(newState);
       updateTasks(newState);
     },
@@ -73,9 +71,12 @@ export const useProjectModal = (
   );
 
   const editProject = useCallback(
-    (project: Project, projectEditIndex: number) => {
+    (project: Project, oldProjectName: string) => {
+      const index = state.projects.findIndex(
+        ({ name }) => name === oldProjectName
+      );
       const newState = lodash.cloneDeep(state);
-      newState.projects[projectEditIndex] = project;
+      newState.projects[index] = project;
       setState(newState);
       updateTasks(newState);
     },
@@ -83,19 +84,28 @@ export const useProjectModal = (
   );
 
   const deleteProject = useCallback(
-    (projectEditIndex: number) => {
+    (projectName: string) => {
+      const index = state.projects.findIndex(
+        ({ name }) => name === projectName
+      );
       const newState = lodash.cloneDeep(state);
-      newState.projects.splice(projectEditIndex, 1);
+      const taskIds = Object.entries(newState.tasks)
+        .filter(([key, value]) => value.content.projectName === projectName)
+        .map(([key, value]) => key);
+      taskIds.forEach(
+        (id) => (newState.tasks[id].content.projectName = "未分類")
+      );
+      newState.projects.splice(index, 1);
       setState(newState);
       updateTasks(newState);
     },
     [setState, state, updateTasks]
   );
 
-  const onClickProjectEdit = (project: Project, index: number) => {
+  const onClickProjectEdit = (project: Project) => {
     setProject(project);
     setProjectEditFlag(true);
-    setProjectEditIndex(index);
+    setProjectEditName(project.name);
     openProjectModal();
   };
 
@@ -121,14 +131,14 @@ export const useProjectModal = (
       introduction,
       color,
     };
-    editProject(project, projectEditIndex);
+    editProject(project, projectEditName);
     reset();
     closeProjectModal();
   };
 
   const onClickDelete = () => {
     // e.stopPropagation();
-    deleteProject(projectEditIndex);
+    deleteProject(projectEditName);
     reset();
     closeProjectModal();
   };
@@ -139,7 +149,9 @@ export const useProjectModal = (
     introduction,
     color,
     projectEditFlag,
-    projectEditIndex,
+    projectEditName,
+    projectFilterName,
+    setProjectFilterName,
     openProjectModal,
     closeProjectModal,
     onChangeName,

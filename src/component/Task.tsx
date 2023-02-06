@@ -1,21 +1,17 @@
 import { theme } from "../styles/theme";
-import { ToDo, ToDoTask } from "../type";
+import { Project, ToDo, ToDoTask } from "../type";
 import { Draggable } from "react-beautiful-dnd";
 import styled from "styled-components";
 import { CgCalendarDue } from "react-icons/cg";
 import { priorities } from "../data/initial-data";
-// import { AiOutlineCloseCircle } from "react-icons/ai";
+import { textColorOfBg } from "../utils/text-color";
 
 type TaskProps = {
   task: ToDoTask;
   index: number;
   columnId: string;
   onClickTask: (todo: ToDo, columnId: string, taskId: string) => void;
-  // onClickDelete: (
-  //   e: React.MouseEvent<HTMLButtonElement | SVGElement, MouseEvent>,
-  //   cloumnId: string,
-  //   taskId: string
-  // ) => void;
+  projects: Project[];
 };
 
 export const Task: React.FC<TaskProps> = ({
@@ -23,8 +19,13 @@ export const Task: React.FC<TaskProps> = ({
   index,
   columnId,
   onClickTask,
-  // onClickDelete,
+  projects,
 }) => {
+  const projectColor =
+    projects.find(({ name }) => name === task.content.projectName)?.color ??
+    "white";
+  const projectTextColor = textColorOfBg(projectColor ?? "#172B4D");
+
   return (
     <Draggable draggableId={task.id} index={index}>
       {(provided) => (
@@ -34,12 +35,6 @@ export const Task: React.FC<TaskProps> = ({
           ref={provided.innerRef}
           onClick={() => onClickTask(task.content, columnId, task.id)}
         >
-          {/* <Title>
-            <span>{task.content.title}</span>
-            <StyledAiOutlineCloseCircle
-              onClick={(e) => onClickDelete(e, columnId, task.id)}
-            />
-          </Title> */}
           <Title>{task.content.title}</Title>
           <Memo>{task.content.memo}</Memo>
           <Others>
@@ -54,6 +49,12 @@ export const Task: React.FC<TaskProps> = ({
                 <span>{task.content.toDoDate}</span>
               </ScheduledDate>
             )}
+            <StyledProject
+              color={projectColor}
+              projectTextColor={projectTextColor}
+            >
+              {task.content.projectName}
+            </StyledProject>
             <Priority>
               <img
                 src={
@@ -115,10 +116,8 @@ const Memo = styled.p`
 const ScheduledDate = styled.div<{ isExpired: boolean }>`
   display: flex;
   align-items: center;
-
   font-size: 12px;
   color: grey;
-  margin-top: 8px;
 
   span {
     margin-left: 2px;
@@ -129,10 +128,21 @@ const ScheduledDate = styled.div<{ isExpired: boolean }>`
 const Others = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
 `;
 
 const Priority = styled.div`
   display: flex;
   align-items: center;
   gap: 5px;
+`;
+
+const StyledProject = styled.div<{ color: string; projectTextColor: string }>`
+  font-size: 10px;
+  background-color: ${({ color }) => color};
+  color: ${({ projectTextColor }) => projectTextColor};
+  padding: 0 4px;
+  border-radius: 4px;
+  line-height: 20px;
 `;

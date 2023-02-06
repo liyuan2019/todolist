@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { CirclePicker, ColorChangeHandler } from "react-color";
 import styled from "styled-components";
 import { colors } from "../data/initial-data";
+import { textColorOfBg } from "../utils/text-color";
 
 type ColorPickerProps = {
   color: string;
@@ -21,11 +22,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
 
   // 選択した背景色の明るさによって文字色を白か黒に設定する
   useEffect(() => {
-    const brightness =
-      parseInt(color.substring(1, 3), 16) * 0.299 +
-      parseInt(color.substring(3, 5), 16) * 0.587 +
-      parseInt(color.substring(5, 7), 16) * 0.114;
-    const textColor = brightness >= 180 ? "#000000" : "#ffffff";
+    const textColor = textColorOfBg(color);
     setTextColor(textColor);
   }, [color]);
 

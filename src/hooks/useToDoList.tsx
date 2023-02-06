@@ -3,6 +3,7 @@ import lodash from "lodash";
 import { useCallback } from "react";
 import { useUpdateTasks } from "./useUpdateTasks";
 
+// !!! タスクのCRUDをまとめて簡易化で一括処理してます !!!
 export const useToDoList = (
   state: Board,
   setState: React.Dispatch<React.SetStateAction<Board>>
@@ -15,13 +16,19 @@ export const useToDoList = (
       const newToDoTask = {
         id: "task-" + (state.count + 1),
         content: toDo,
+        show: true,
       };
       newState.tasks[newToDoTask.id] = newToDoTask;
       newState.columns["column-1"].taskIds.push(newToDoTask.id);
       newState.count++;
-
       setState(newState);
-      updateTasks(newState);
+
+      const updateState = lodash.cloneDeep(newState);
+      const filteredIds = Object.entries(updateState.tasks)
+        .filter(([key, value]) => !value.show)
+        .map(([key, value]) => key);
+      filteredIds.forEach((id) => (updateState.tasks[id].show = true));
+      updateTasks(updateState);
     },
     [setState, state, updateTasks]
   );
@@ -35,7 +42,13 @@ export const useToDoList = (
         1
       );
       setState(newState);
-      updateTasks(newState);
+
+      const updateState = lodash.cloneDeep(newState);
+      const filteredIds = Object.entries(updateState.tasks)
+        .filter(([key, value]) => !value.show)
+        .map(([key, value]) => key);
+      filteredIds.forEach((id) => (updateState.tasks[id].show = true));
+      updateTasks(updateState);
     },
     [setState, state, updateTasks]
   );
@@ -44,9 +57,14 @@ export const useToDoList = (
     (toDo: ToDo, id: string) => {
       const newState = lodash.cloneDeep(state);
       newState.tasks[id].content = toDo;
-
       setState(newState);
-      updateTasks(newState);
+
+      const updateState = lodash.cloneDeep(newState);
+      const filteredIds = Object.entries(updateState.tasks)
+        .filter(([key, value]) => !value.show)
+        .map(([key, value]) => key);
+      filteredIds.forEach((id) => (updateState.tasks[id].show = true));
+      updateTasks(updateState);
     },
     [setState, state, updateTasks]
   );

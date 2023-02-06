@@ -72,13 +72,10 @@ export const TaskModal: React.FC<TaskModalProps> = ({
 
   const textAreaRef = useAutoResizeTextArea(memo);
 
-  // const [projectModalOpen, setProjectModalOpen] = useState<boolean>(false);
-
   return (
     <>
       <Modal
         isOpen={modalOpen}
-        // onAfterOpen={afterOpenModal}
         onRequestClose={closeModal}
         style={modalStyle}
         contentLabel="タスクを作成"

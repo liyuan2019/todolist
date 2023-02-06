@@ -61,7 +61,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
           <Label htmlFor="name">名前(略称)</Label>
           <Input
             id="name"
-            maxLength={20}
+            maxLength={16}
             name="name"
             value={name}
             onChange={onChangeName}
@@ -84,7 +84,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
         </Item>
       </ModalContent>
       <ModalFooter>
-        {projectEditFlag && (
+        {projectEditFlag && name !== "未分類" && (
           <DeleteButton onClick={onClickDelete}>削除</DeleteButton>
         )}
         <Button onClick={onClickCancel}>キャンセル</Button>

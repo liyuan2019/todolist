@@ -1,5 +1,5 @@
 import { theme } from "../styles/theme";
-import { ToDo, ToDoColumn, ToDoTask } from "../type";
+import { Project, ToDo, ToDoColumn, ToDoTask } from "../type";
 import { Droppable } from "react-beautiful-dnd";
 import styled from "styled-components";
 import { Task } from "./Task";
@@ -8,17 +8,14 @@ type ColumnProps = {
   column: ToDoColumn;
   tasks: ToDoTask[];
   onClickTask: (todo: ToDo, columnId: string, taskId: string) => void;
-  // onClickDelete: (
-  //   e: React.MouseEvent<HTMLButtonElement | SVGElement, MouseEvent>,
-  //   cloumnId: string,
-  //   taskId: string
-  // ) => void;
+  projects: Project[];
 };
 
 export const Column: React.FC<ColumnProps> = ({
   column,
   tasks,
   onClickTask,
+  projects,
   // onClickDelete,
 }) => {
   return (
@@ -27,16 +24,19 @@ export const Column: React.FC<ColumnProps> = ({
       <Droppable droppableId={column.id}>
         {(provided) => (
           <TaskList ref={provided.innerRef} {...provided.droppableProps}>
-            {tasks.map((task, index) => (
-              <Task
-                key={task.id}
-                task={task}
-                columnId={column.id}
-                index={index}
-                onClickTask={onClickTask}
-                // onClickDelete={onClickDelete}
-              />
-            ))}
+            {tasks.map(
+              (task, index) =>
+                task.show && (
+                  <Task
+                    key={task.id}
+                    task={task}
+                    columnId={column.id}
+                    index={index}
+                    onClickTask={onClickTask}
+                    projects={projects}
+                  />
+                )
+            )}
             {provided.placeholder}
           </TaskList>
         )}

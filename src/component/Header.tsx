@@ -4,15 +4,18 @@ import styled from "styled-components";
 import { SiTodoist } from "react-icons/si";
 import { IoIosNotifications, IoIosSettings, IoMdSearch } from "react-icons/io";
 import { BiChevronDown } from "react-icons/bi";
+import { MdEdit } from "react-icons/md";
 import { MdAdd } from "react-icons/md";
-import { AiFillQuestionCircle } from "react-icons/ai";
+import { AiFillQuestionCircle, AiOutlinePlus } from "react-icons/ai";
 import { ChangeEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
 import { baseURL, initialData } from "../data/initial-data";
-import { Board, ToDo } from "../type";
+import { Board, Project, ToDo } from "../type";
+import lodash from "lodash";
+import { textColorOfBg } from "../utils/text-color";
 
 export let loginId = "";
 
@@ -49,15 +52,6 @@ const searchModalStyle = {
   },
 };
 
-type Menu = {
-  title: string;
-  subMenu: {
-    title: string;
-    url: string;
-  }[];
-  // show: boolean;
-};
-
 type SearchResult = {
   id: string;
   content: ToDo;
@@ -66,16 +60,22 @@ type SearchResult = {
 
 type HeaderProps = {
   openModal: () => void;
+  openProjectModal: () => void;
   state: Board;
   setState: React.Dispatch<React.SetStateAction<Board>>;
   onClickTask: (todo: ToDo, columnId: string, taskId: string) => void;
+  onClickProjectEdit: (project: Project) => void;
+  setProjectFilterName: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export const Header: React.FC<HeaderProps> = ({
   openModal,
+  openProjectModal,
   state,
   setState,
   onClickTask,
+  onClickProjectEdit,
+  setProjectFilterName,
 }) => {
   const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
@@ -84,12 +84,29 @@ export const Header: React.FC<HeaderProps> = ({
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loginError, setLoginError] = useState<string>("");
-  // const [isSystemError, setIsSystemError] = useState<boolean>(false);
   const [isLogged, setIsLogged] = useState<string>("");
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [composing, setComposition] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState<boolean>(false);
   const [searchResult, setSearchResult] = useState<SearchResult[]>([]);
+
+  const filterByProject = (projectName: string) => {
+    setProjectFilterName(projectName);
+    const newState = lodash.cloneDeep(state);
+    for (let key in newState.tasks) {
+      newState.tasks[key].show = true;
+    }
+
+    if (projectName !== "") {
+      const filteredIds = Object.entries(newState.tasks)
+        .filter(([key, value]) => value.content.projectName !== projectName)
+        .map(([key, value]) => key);
+
+      filteredIds.forEach((id) => (newState.tasks[id].show = false));
+    }
+
+    setState(newState);
+  };
 
   const onChangeSearchText = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);
@@ -106,96 +123,6 @@ export const Header: React.FC<HeaderProps> = ({
   const onChangePassword = (e: ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
-
-  const menu: Menu[] = [
-    {
-      title: "プロジェクト",
-      subMenu: [
-        { title: "プロジェクト1", url: "" },
-        { title: "プロジェクト2", url: "" },
-      ],
-    },
-  ];
-
-  // const [menu, setMenu] = useState<Menu[]>([
-  //   {
-  //     title: "あなたの作業",
-  //     subMenu: [
-  //       { title: "作業1", url: "" },
-  //       { title: "作業2", url: "" },
-  //     ],
-  //     show: true,
-  //   },
-  //   {
-  //     title: "プロジェクト",
-  //     subMenu: [
-  //       { title: "プロジェクト1", url: "" },
-  //       { title: "プロジェクト2", url: "" },
-  //     ],
-  //     show: true,
-  //   },
-  //   {
-  //     title: "フィルター",
-  //     subMenu: [
-  //       { title: "フィルター1", url: "" },
-  //       { title: "フィルター2", url: "" },
-  //     ],
-  //     show: true,
-  //   },
-  // ]);
-
-  // const [detailMenu, setDetailMenu] = useState<{
-  //   title: string;
-  //   subMenu: Menu[];
-  //   show: boolean;
-  // }>({
-  //   title: "詳細",
-  //   subMenu: [],
-  //   show: false,
-  // });
-
-  // const arrangeMenu = useCallback(() => {
-  //   let detail = detailMenu;
-  //   let alterMenu = menu;
-  //   if (window.innerWidth < 760) {
-  //     detail = {
-  //       title: "詳細",
-  //       subMenu: [menu[0], menu[1], menu[2]],
-  //       show: true,
-  //     };
-  //     alterMenu[2].show = false;
-  //     alterMenu[1].show = false;
-  //     alterMenu[0].show = false;
-  //   } else if (window.innerWidth < 918) {
-  //     detail = {
-  //       title: "詳細",
-  //       subMenu: [menu[1], menu[2]],
-  //       show: true,
-  //     };
-  //     alterMenu[2].show = false;
-  //     alterMenu[1].show = false;
-  //     alterMenu[0].show = true;
-  //   } else {
-  //     detail = {
-  //       title: "詳細",
-  //       subMenu: [],
-  //       show: false,
-  //     };
-  //     alterMenu[2].show = true;
-  //     alterMenu[1].show = true;
-  //     alterMenu[0].show = true;
-  //   }
-  //   setDetailMenu(detail);
-  //   setMenu(alterMenu);
-  // }, [detailMenu, menu]);
-
-  // window.onresize = arrangeMenu;
-
-  // useEffect(() => {
-  //   arrangeMenu();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
-
   const openLoginModal = () => {
     setIsSignUp(false);
     setLoginModalOpen(true);
@@ -296,6 +223,7 @@ export const Header: React.FC<HeaderProps> = ({
   const logout = () => {
     setIsLogged("");
     setSearchText("");
+    setProjectFilterName("");
     setState(initialData);
   };
 
@@ -342,49 +270,38 @@ export const Header: React.FC<HeaderProps> = ({
             ToDo
           </LogoLink>
           <MenuBar>
-            {menu.map(({ title, subMenu }, i) => (
-              <Dropdown as={ButtonWrapper} key={title}>
-                <Dropdown.Toggle as={MenuButton}>
-                  <span>{title}</span>
-                  <BiChevronDown size={16} color="#97A1AF" />
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  {subMenu.length > 0 &&
-                    subMenu.map(({ title, url }) => (
-                      <Dropdown.Item href={url} key={title}>
-                        {title}
-                      </Dropdown.Item>
-                    ))}
-                </Dropdown.Menu>
-              </Dropdown>
-            ))}
-            {/* {detailMenu.show && (
-              <Dropdown as={ButtonWrapper}>
-                <Dropdown.Toggle as={MenuButton}>
-                  <span>{detailMenu.title}</span>
-                  <BiChevronDown size={16} color="#97A1AF" />
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  {detailMenu.subMenu.length > 0 &&
-                    detailMenu.subMenu.map(({ title, subMenu }, i) => (
-                      <Dropdown.Item key={title}>
-                        <Dropdown>
-                          <Dropdown.Toggle as={MenuButton}>
-                            {title}
-                          </Dropdown.Toggle>
-                          <Dropdown.Menu>
-                            {subMenu.map(({ title, url }) => (
-                              <Dropdown.Item href={url} key={title}>
-                                {title}
-                              </Dropdown.Item>
-                            ))}
-                          </Dropdown.Menu>
-                        </Dropdown>
-                      </Dropdown.Item>
-                    ))}
-                </Dropdown.Menu>
-              </Dropdown>
-            )} */}
+            <Dropdown as={ButtonWrapper}>
+              <Dropdown.Toggle as={MenuButton}>
+                <span>プロジェクト</span>
+                <BiChevronDown size={16} color="#97A1AF" />
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                {state.projects.map((project) => (
+                  <Dropdown.Item
+                    key={project.name}
+                    onClick={(e) => filterByProject(project.name)}
+                  >
+                    <Item>
+                      <span>{project.name}</span>
+                      <StyledMdEdit
+                        size={16}
+                        className="project"
+                        onClick={(e) => onClickProjectEdit(project)}
+                      />
+                    </Item>
+                  </Dropdown.Item>
+                ))}
+                <Dropdown.Item onClick={(e) => filterByProject("")}>
+                  全部
+                </Dropdown.Item>
+                <Dropdown.Item onClick={(e) => openProjectModal()}>
+                  <Add>
+                    <StyledAiOutlinePlus color="green" size={18} />
+                    <span>プロジェクト追加</span>
+                  </Add>
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           </MenuBar>
           <CreateButton onClick={openModal}>
             <Txt>作成</Txt>
@@ -419,10 +336,10 @@ export const Header: React.FC<HeaderProps> = ({
             <IoIosSettings size={24} />
           </IconButton>
           {isLogged === "" ? (
-            <IconButton data-tip="プロフィールと設定" onClick={openLoginModal}>
+            <Button data-tip="プロフィールと設定" onClick={openLoginModal}>
               {/* <ProfileImg /> */}
               LOGIN
-            </IconButton>
+            </Button>
           ) : (
             <Dropdown as={ButtonWrapper}>
               <Dropdown.Toggle as={MenuButton}>
@@ -495,36 +412,58 @@ export const Header: React.FC<HeaderProps> = ({
         {searchResult.length > 0 && (
           <>
             <ModalHeader>検索結果</ModalHeader>
-            <ul>
-              {searchResult.map(({ id, content, columnId }) => (
-                <Result
-                  onClick={() => onClickTask(content, columnId, id)}
-                  key={id}
-                >
-                  <span>{content.title}</span>
-                  <span
-                    className="date"
-                    data-is-expired={
-                      new Date(content.toDoDate) <
-                      new Date(new Date().toLocaleDateString())
-                    }
+            <ResultWrapper>
+              {searchResult.map(({ id, content, columnId }) => {
+                const projectColor =
+                  state.projects.find(
+                    ({ name }) => name === content.projectName
+                  )?.color ?? "white";
+                const projectTextColor = textColorOfBg(
+                  projectColor ?? "#172B4D"
+                );
+                return (
+                  <Result
+                    onClick={() => onClickTask(content, columnId, id)}
+                    key={id}
                   >
-                    {content.toDoDate}
-                  </span>
-                  <div className="status">
-                    <span data-type={initialData.columns[columnId].title}>
-                      {initialData.columns[columnId].title}
+                    <span>{content.title}</span>
+                    <span
+                      className="date"
+                      data-is-expired={
+                        new Date(content.toDoDate) <
+                        new Date(new Date().toLocaleDateString())
+                      }
+                    >
+                      {content.toDoDate}
                     </span>
-                  </div>
-                </Result>
-              ))}
-            </ul>
+                    <div className="project">
+                      <StyledProject
+                        color={projectColor}
+                        projectTextColor={projectTextColor}
+                      >
+                        {content.projectName}
+                      </StyledProject>
+                    </div>
+
+                    <div className="status">
+                      <span data-type={initialData.columns[columnId].title}>
+                        {initialData.columns[columnId].title}
+                      </span>
+                    </div>
+                  </Result>
+                );
+              })}
+            </ResultWrapper>
           </>
         )}
       </Modal>
     </>
   );
 };
+
+const ResultWrapper = styled.ul`
+  padding-left: 0px;
+`;
 
 const Result = styled.li`
   display: flex;
@@ -534,7 +473,7 @@ const Result = styled.li`
   padding: 8px;
 
   span:first-child {
-    width: 500px;
+    width: 400px;
   }
 
   span:nth-child(2) {
@@ -545,6 +484,10 @@ const Result = styled.li`
     &[data-is-expired="true"] {
       color: red;
     }
+  }
+
+  .project {
+    width: 100px;
   }
 
   .status {
@@ -666,6 +609,14 @@ const MenuBar = styled.div`
   height: 100%;
   position: relative;
 
+  .dropdown-item {
+    &:hover {
+      .project {
+        display: block;
+      }
+    }
+  }
+
   .selected {
     color: ${theme.colors.primaryblue};
     &::after {
@@ -766,7 +717,7 @@ const RightDiv = styled.div`
 const SeachWrapper = styled.div`
   position: relative;
   max-width: 100%;
-  width: 200px;
+  min-width: 200px;
   margin-right: 4px;
 
   @media screen and (max-width: 650px) {
@@ -827,3 +778,37 @@ const StyledIoIosNotifications = styled(IoIosNotifications)`
 //   border-radius: 50%;
 //   flex-shrink: 0;
 // `;
+
+const Item = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const StyledMdEdit = styled(MdEdit)`
+  display: none;
+  transform: translateX(10px);
+  border-radius: 4px;
+
+  &:hover {
+    background-color: #97a1af;
+  }
+`;
+const Add = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const StyledAiOutlinePlus = styled(AiOutlinePlus)`
+  margin-right: 8px;
+`;
+
+const StyledProject = styled.div<{ color: string; projectTextColor: string }>`
+  font-size: 12px;
+  background-color: ${({ color }) => color};
+  color: ${({ projectTextColor }) => projectTextColor};
+  padding: 0 4px;
+  border-radius: 4px;
+  line-height: 20px;
+  width: fit-content;
+`;
