@@ -1,29 +1,39 @@
 import { theme } from "../styles/theme";
-import { Project, ToDo, ToDoTask } from "../type";
+import { ToDoTask } from "../type";
 import { Draggable } from "react-beautiful-dnd";
 import styled from "styled-components";
 import { CgCalendarDue } from "react-icons/cg";
 import { priorities } from "../data/initial-data";
 import { textColorOfBg } from "../utils/text-color";
+import { useDispatch, useSelector, RootState } from "../store";
+import { selectProjectColor } from "../store/tasksSlice";
+import { setTaskModal } from "../store/taskModalSlice";
 
 type TaskProps = {
   task: ToDoTask;
   index: number;
   columnId: string;
-  onClickTask: (todo: ToDo, columnId: string, taskId: string) => void;
-  projects: Project[];
+  // onClickTask: (todo: ToDo, columnId: string, taskId: string) => void;
+  // projects: Project[];
 };
 
 export const Task: React.FC<TaskProps> = ({
   task,
   index,
   columnId,
-  onClickTask,
-  projects,
+  // onClickTask,
+  // projects,
 }) => {
-  const projectColor =
-    projects.find(({ name }) => name === task.content.projectName)?.color ??
-    "white";
+  const dispatch = useDispatch();
+
+  // const { onClickTask } = useTaskModal();
+
+  // const projectColor =
+  //   projects.find(({ name }) => name === task.content.projectName)?.color ??
+  //   "white";
+  const projectColor = useSelector((state: RootState) =>
+    selectProjectColor(state, task.content.projectName)
+  );
   const projectTextColor = textColorOfBg(projectColor ?? "#172B4D");
 
   return (
@@ -33,7 +43,11 @@ export const Task: React.FC<TaskProps> = ({
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           ref={provided.innerRef}
-          onClick={() => onClickTask(task.content, columnId, task.id)}
+          onClick={() =>
+            dispatch(
+              setTaskModal({ todo: task.content, columnId, taskId: task.id })
+            )
+          }
         >
           <Title>{task.content.title}</Title>
           <Memo>{task.content.memo}</Memo>

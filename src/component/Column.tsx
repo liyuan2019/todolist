@@ -1,23 +1,29 @@
 import { theme } from "../styles/theme";
-import { Project, ToDo, ToDoColumn, ToDoTask } from "../type";
+import { ToDoColumn, ToDoTask } from "../type";
 import { Droppable } from "react-beautiful-dnd";
 import styled from "styled-components";
 import { Task } from "./Task";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
+// import { useTaskModal } from "../hooks/useTaskModal";
 
 type ColumnProps = {
   column: ToDoColumn;
   tasks: ToDoTask[];
-  onClickTask: (todo: ToDo, columnId: string, taskId: string) => void;
-  projects: Project[];
+  // onClickTask: (todo: ToDo, columnId: string, taskId: string) => void;
+  // projects: Project[];
 };
 
 export const Column: React.FC<ColumnProps> = ({
   column,
   tasks,
-  onClickTask,
-  projects,
+  // onClickTask,
+  // projects,
   // onClickDelete,
 }) => {
+  const projectFilterName = useSelector(
+    (state: RootState) => state.filter.projectFilterName
+  );
   return (
     <Container>
       <Title>{column.title}</Title>
@@ -26,14 +32,15 @@ export const Column: React.FC<ColumnProps> = ({
           <TaskList ref={provided.innerRef} {...provided.droppableProps}>
             {tasks.map(
               (task, index) =>
-                task.show && (
+                (projectFilterName === "" ||
+                  task.content.projectName === projectFilterName) && (
                   <Task
                     key={task.id}
                     task={task}
                     columnId={column.id}
                     index={index}
-                    onClickTask={onClickTask}
-                    projects={projects}
+                    // onClickTask={onClickTask}
+                    // projects={projects}
                   />
                 )
             )}

@@ -33,7 +33,6 @@ export type ToDoColumn = {
 export type ToDoTask = {
   id: string;
   content: ToDo;
-  show: boolean;
 };
 
 export type Board = {

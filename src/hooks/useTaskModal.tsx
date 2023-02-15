@@ -1,30 +1,33 @@
-import { Board, ToDo, Priority } from "../type";
+import { ToDo, Priority } from "../type";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useToDoList } from "./useToDoList";
+import { resetTaskModal } from "../store/taskModalSlice";
+import { RootState, useDispatch, useSelector } from "../store";
 
-export const useModal = (
-  state: Board,
-  setState: React.Dispatch<React.SetStateAction<Board>>
-) => {
+export const useTaskModal = () => {
   const today = new Date().toLocaleDateString();
-  const [modalOpen, setModalOpen] = useState(false);
-  const { addTodo, editTodo, deleteTodo } = useToDoList(state, setState);
-  const [todo, setTodo] = useState<ToDo>({
-    title: "",
-    memo: "",
-    subTask: [],
-    toDoDate: today,
-    priority: "medium",
-    projectName: "未分類",
-  });
+  // const [modalOpen, setModalOpen] = useState(false);
+  const dispatch = useDispatch();
+  const { addTodo, editTodo, deleteTodo } = useToDoList();
+  // const [todo, setTodo] = useState<ToDo>({
+  //   title: "",
+  //   memo: "",
+  //   subTask: [],
+  //   toDoDate: today,
+  //   priority: "medium",
+  //   projectName: "未分類",
+  // });
+  const { todo, editColumnId, editTaskId } = useSelector(
+    (state: RootState) => state.taskModal
+  );
 
   const [title, setTitle] = useState<string>("");
   const [memo, setMemo] = useState<string>("");
   const [toDoDate, setTodoDate] = useState<string>(today);
   const [subTask, setSubTask] = useState<string[]>([]);
-  const [editFlag, setEditFlag] = useState<boolean>(false);
-  const [editTaskId, setEditTaskId] = useState<string>("");
-  const [editColumnId, setEditColumnId] = useState<string>("");
+  // const [editFlag, setEditFlag] = useState<boolean>(false);
+  // const [editTaskId, setEditTaskId] = useState<string>("");
+  // const [editColumnId, setEditColumnId] = useState<string>("");
   const [priority, setPriority] = useState<Priority>("medium");
   const [projectName, setProjectName] = useState<string>("未分類");
 
@@ -44,14 +47,14 @@ export const useModal = (
     todo.projectName,
   ]);
 
-  function openModal() {
-    setModalOpen(true);
-  }
+  // function openTaskModal() {
+  //   dispatch(setTaskModalOpen(true));
+  // }
 
-  function closeModal() {
-    reset();
-    setModalOpen(false);
-  }
+  // function closeModal() {
+  //   reset();
+  //   dispatch(setTaskModalOpen(false));
+  // }
 
   const onChangeTitle = (e: ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
@@ -78,24 +81,25 @@ export const useModal = (
     setProjectName(project);
   };
 
-  const reset = () => {
+  const resetTask = () => {
     setTitle("");
     setMemo("");
     setTodoDate(today);
     setSubTask([]);
     setPriority("medium");
     setProjectName("未分類");
-    setTodo({
-      title: "",
-      memo: "",
-      subTask: [],
-      toDoDate: new Date().toLocaleDateString(),
-      priority: "medium",
-      projectName: "未分類",
-    });
-    setEditFlag(false);
-    setEditTaskId("");
-    setEditColumnId("");
+    // setTodo({
+    //   title: "",
+    //   memo: "",
+    //   subTask: [],
+    //   toDoDate: new Date().toLocaleDateString(),
+    //   priority: "medium",
+    //   projectName: "未分類",
+    // });
+    // setEditFlag(false);
+    // setEditTaskId("");
+    // setEditColumnId("");
+    dispatch(resetTaskModal());
   };
 
   const onClickSubTaskAdd = () => {
@@ -118,22 +122,25 @@ export const useModal = (
       projectName,
     };
     addTodo(toDoList);
-    reset();
-    closeModal();
+    // dispatch(resetTaskModal());
+    resetTask();
+    // reset();
+    // closeModal();
   };
 
-  const onClickCancel = () => {
-    reset();
-    closeModal();
-  };
+  // const onClickCancel = () => {
+  //   reset();
+  //   closeModal();
+  // };
 
-  const onClickTask = (todo: ToDo, columnId: string, taskId: string) => {
-    setTodo(todo);
-    setEditFlag(true);
-    setEditTaskId(taskId);
-    setEditColumnId(columnId);
-    openModal();
-  };
+  // const onClickTask = (todo: ToDo, columnId: string, taskId: string) => {
+  //   // setTodo(todo);
+  //   // setEditFlag(true);
+  //   // setEditTaskId(taskId);
+  //   // setEditColumnId(columnId);
+
+  //   openTaskModal();
+  // };
 
   const onClickEdit = () => {
     const toDoList: ToDo = {
@@ -145,29 +152,29 @@ export const useModal = (
       projectName,
     };
     editTodo(toDoList, editTaskId);
-    reset();
-    closeModal();
+    // dispatch(resetTaskModal());
+    resetTask();
   };
 
   const onClickDelete = () => {
     // e.stopPropagation();
     deleteTodo(editColumnId, editTaskId);
-    reset();
-    closeModal();
+    // dispatch(resetTaskModal());
+    resetTask();
   };
 
   return {
-    modalOpen,
     title,
     memo,
     subTask,
     toDoDate,
     priority,
     projectName,
-    editFlag,
-    editColumnId,
-    openModal,
-    closeModal,
+    // editFlag,
+    // editColumnId,
+    // openTaskModal,
+    // closeModal,
+    resetTask,
     onChangeTitle,
     onChangeMemo,
     onChangeSubTask,
@@ -175,12 +182,12 @@ export const useModal = (
     onChangeProjectName,
     onClickSubTaskAdd,
     setTodoDate,
-    onClickTask,
-    onClickCancel,
+    // onClickTask,
+    // onClickCancel,
     onClickAdd,
     onClickEdit,
     onClickDelete,
   };
 };
 
-export type UseModalReturn = ReturnType<typeof useModal>;
+export type UseTaskModalReturn = ReturnType<typeof useTaskModal>;

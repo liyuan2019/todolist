@@ -4,45 +4,49 @@ import { DragDropContext } from "react-beautiful-dnd";
 import styled from "styled-components";
 import { Layout } from "./component/Layout";
 import { useDrag } from "./hooks/useDrag";
-import { useModal } from "./hooks/useModal";
+// import { useTaskModal } from "./hooks/useTaskModal";
 import { TaskModal } from "./component/TaskModal";
 import { ProjectModal } from "./component/ProjectModal";
-import { useProjectModal } from "./hooks/useProjectModal";
+// import { useProjectModal } from "./hooks/useProjectModal";
 import { textColorOfBg } from "./utils/text-color";
+import { useSelector } from "react-redux";
+import { selectAllTasks } from "./store/tasksSlice";
+import { selectProjectFilterName } from "./store/filterSlice";
 
 export const App: React.FC = () => {
-  const { state, setState, onDragEnd } = useDrag();
-  const useModalReturn = useModal(state, setState);
-  const useProjectModalReturn = useProjectModal(state, setState);
-  const { openModal, onClickTask } = useModalReturn;
-  const {
-    openProjectModal,
-    onClickProjectEdit,
-    projectFilterName,
-    setProjectFilterName,
-  } = useProjectModalReturn;
+  const tasks = useSelector(selectAllTasks);
+  const projectFilterName = useSelector(selectProjectFilterName);
 
-  const project = state.projects.find(({ name }) => name === projectFilterName);
+  const { onDragEnd } = useDrag();
+
+  // const UseTaskModalReturn = useTaskModal();
+  // const useProjectModalReturn = useProjectModal();
+  // const { openTaskModal, onClickTask } = UseTaskModalReturn;
+  // const {
+  //   openProjectModal,
+  //   onClickProjectEdit,
+  //   projectFilterName,
+  //   setProjectFilterName,
+  // } = useProjectModalReturn;
+
+  // const { onClickTask } = useTaskModal();
+
+  const project = tasks.projects.find(({ name }) => name === projectFilterName);
   const projectColor = project?.color ?? "white";
   const projectTextColor = textColorOfBg(projectColor ?? "#172B4D");
   const projectIntrodution = project?.introduction ?? "";
 
   return (
     <Layout
-      openModal={openModal}
-      openProjectModal={openProjectModal}
-      state={state}
-      setState={setState}
-      onClickTask={onClickTask}
-      onClickProjectEdit={onClickProjectEdit}
-      setProjectFilterName={setProjectFilterName}
+    // onClickTask={onClickTask}
+    // onClickProjectEdit={onClickProjectEdit}
     >
       <TaskModal
-        useModalReturn={useModalReturn}
-        projects={state.projects.map((p) => p.name)}
-        openProjectModal={openProjectModal}
+      // UseTaskModalReturn={UseTaskModalReturn}
+      // openProjectModal={openProjectModal}
       />
-      <ProjectModal useProjectModalReturn={useProjectModalReturn} />
+      {/* <ProjectModal useProjectModalReturn={useProjectModalReturn} /> */}
+      <ProjectModal />
       {projectFilterName !== "" && (
         <ProjectInfo>
           <StyledProject
@@ -56,16 +60,18 @@ export const App: React.FC = () => {
       )}
       <DragDropContext onDragEnd={onDragEnd}>
         <Container>
-          {state.columnOrder.map((columnId) => {
-            const column = state.columns[columnId];
-            const tasks = column.taskIds.map((taskId) => state.tasks[taskId]);
+          {tasks.columnOrder.map((columnId) => {
+            const column = tasks.columns[columnId];
+            const tasksOfcolumn = column.taskIds.map(
+              (taskId) => tasks.tasks[taskId]
+            );
             return (
               <Column
                 key={column.id}
                 column={column}
-                tasks={tasks}
-                onClickTask={onClickTask}
-                projects={state.projects}
+                tasks={tasksOfcolumn}
+                // onClickTask={onClickTask}
+                // projects={tasks.projects}
               />
             );
           })}

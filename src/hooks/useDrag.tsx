@@ -1,11 +1,11 @@
-import { initialData } from "../data/initial-data";
-import { useState } from "react";
 import { DropResult } from "react-beautiful-dnd";
-import { Board } from "../type";
 import { useUpdateTasks } from "./useUpdateTasks";
+import { useDispatch, useSelector } from "../store";
+import { selectAllTasks, setTasks } from "../store/tasksSlice";
 
 export const useDrag = () => {
-  const [state, setState] = useState<Board>(initialData);
+  const dispatch = useDispatch();
+  const tasks = useSelector(selectAllTasks);
 
   const { updateTasks } = useUpdateTasks();
 
@@ -23,8 +23,8 @@ export const useDrag = () => {
       return;
     }
 
-    const start = state.columns[source.droppableId];
-    const finish = state.columns[destination.droppableId];
+    const start = tasks.columns[source.droppableId];
+    const finish = tasks.columns[destination.droppableId];
 
     if (start === finish) {
       const newTaskIds = Array.from(start.taskIds);
@@ -37,14 +37,14 @@ export const useDrag = () => {
       };
 
       const newState = {
-        ...state,
+        ...tasks,
         columns: {
-          ...state.columns,
+          ...tasks.columns,
           [newColumn.id]: newColumn,
         },
       };
 
-      setState(newState);
+      dispatch(setTasks(newState));
       updateTasks(newState);
       return;
     }
@@ -65,16 +65,16 @@ export const useDrag = () => {
     };
 
     const newState = {
-      ...state,
+      ...tasks,
       columns: {
-        ...state.columns,
+        ...tasks.columns,
         [newStart.id]: newStart,
         [newFinish.id]: newFinish,
       },
     };
-    setState(newState);
+    dispatch(setTasks(newState));
     updateTasks(newState);
   };
 
-  return { state, setState, onDragEnd };
+  return { onDragEnd };
 };
