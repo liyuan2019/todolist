@@ -3,6 +3,8 @@ import Modal from "react-modal";
 import styled from "styled-components";
 import { HiPlus } from "react-icons/hi";
 import { RiCalendarTodoFill } from "react-icons/ri";
+import BootstrapModal from "react-bootstrap/Modal";
+import BootstrapButton from "react-bootstrap/Button";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ja from "date-fns/locale/ja";
@@ -14,6 +16,7 @@ import { BiChevronDown } from "react-icons/bi";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useDispatch, useSelector, RootState } from "../store";
 import { setProjectModalOpen } from "../store/projectModalSlice";
+import { useState } from "react";
 
 Modal.setAppElement("#root");
 
@@ -67,6 +70,13 @@ export const TaskModal: React.FC = () => {
   } = useTaskModal();
 
   const textAreaRef = useAutoResizeTextArea(memo);
+
+  const [deleteDialogShow, setDeleteDialogShow] = useState(false);
+
+  const handleDelete = () => {
+    onClickDelete();
+    setDeleteDialogShow(false);
+  };
 
   return (
     <>
@@ -217,7 +227,9 @@ export const TaskModal: React.FC = () => {
         </CreateTask>
         <ModalFooter>
           {editFlag && (
-            <DeleteButton onClick={onClickDelete}>削除</DeleteButton>
+            <DeleteButton onClick={() => setDeleteDialogShow(true)}>
+              削除
+            </DeleteButton>
           )}
           <Button onClick={resetTask}>キャンセル</Button>
           <CreateButton
@@ -236,6 +248,28 @@ export const TaskModal: React.FC = () => {
           </EditButton>
         </ModalFooter>
       </Modal>
+      <BootstrapModal
+        show={deleteDialogShow}
+        onHide={() => setDeleteDialogShow(false)}
+      >
+        <BootstrapModal.Header closeButton>
+          <BootstrapModal.Title>タスクの削除</BootstrapModal.Title>
+        </BootstrapModal.Header>
+        <BootstrapModal.Body>
+          このタスクを本当に削除してよろしいですか？
+        </BootstrapModal.Body>
+        <BootstrapModal.Footer>
+          <BootstrapButton
+            variant="secondary"
+            onClick={() => setDeleteDialogShow(false)}
+          >
+            いいえ
+          </BootstrapButton>
+          <BootstrapButton variant="danger" onClick={handleDelete}>
+            はい
+          </BootstrapButton>
+        </BootstrapModal.Footer>
+      </BootstrapModal>
     </>
   );
 };

@@ -13,7 +13,7 @@ import { Dropdown } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
 import { baseURL, initialData } from "../data/initial-data";
-import { ToDo } from "../type";
+import { Project, ToDo } from "../type";
 import { textColorOfBg } from "../utils/text-color";
 import { clearState, selectAllTasks, setTasks } from "../store/tasksSlice";
 import { useDispatch, useSelector } from "../store";
@@ -234,6 +234,16 @@ export const Header: React.FC = () => {
     }
   };
 
+  const handleProjectEdit = (
+    e: React.MouseEvent<SVGElement, MouseEvent>,
+    project: Project
+  ) => {
+    e.stopPropagation();
+    let element = document.getElementById("project-dropdown");
+    element?.classList.remove("show");
+    dispatch(setProjectModal(project));
+  };
+
   return (
     <>
       <HeaderStyle>
@@ -249,7 +259,7 @@ export const Header: React.FC = () => {
                 <span>プロジェクト</span>
                 <BiChevronDown size={16} color="#97A1AF" />
               </Dropdown.Toggle>
-              <Dropdown.Menu>
+              <Dropdown.Menu id="project-dropdown">
                 {tasks.projects.map((project) => (
                   <Dropdown.Item
                     key={project.name}
@@ -260,7 +270,7 @@ export const Header: React.FC = () => {
                       <StyledMdEdit
                         size={16}
                         className="project"
-                        onClick={() => dispatch(setProjectModal(project))}
+                        onClick={(e) => handleProjectEdit(e, project)}
                       />
                     </Item>
                   </Dropdown.Item>

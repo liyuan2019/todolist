@@ -1,16 +1,19 @@
 import { theme } from "../styles/theme";
 import Modal from "react-modal";
 import styled from "styled-components";
+import BootstrapModal from "react-bootstrap/Modal";
+import BootstrapButton from "react-bootstrap/Button";
 import { useProjectModal } from "../hooks/useProjectModal";
 import { ColorPicker } from "./ColorPicker";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
+import { useState } from "react";
 
 Modal.setAppElement("#root");
 
 const modalStyle = {
   overlay: {
-    backgroundColor: "transparent",
+    backgroundColor: `${theme.colors.backgroundOverlay}`,
     zIndex: 1,
   },
   content: {
@@ -44,64 +47,97 @@ export const ProjectModal: React.FC = () => {
     (state: RootState) => state.projectModal
   );
 
+  const [deleteDialogShow, setDeleteDialogShow] = useState(false);
+
+  const handleDelete = () => {
+    onClickDelete();
+    setDeleteDialogShow(false);
+  };
+
   return (
-    <Modal
-      isOpen={projectModalOpen}
-      onRequestClose={resetProject}
-      style={modalStyle}
-      contentLabel="プロジェクト追加"
-    >
-      <ModalHeader>
-        {editFlag ? "プロジェクト編集" : "プロジェクト追加"}
-      </ModalHeader>
-      <ModalContent>
-        <Item>
-          <Label htmlFor="name">名前(略称)</Label>
-          <Input
-            id="name"
-            maxLength={16}
-            name="name"
-            value={name}
-            onChange={onChangeName}
-          />
-        </Item>
-        <Item>
-          <Label htmlFor="introduction">説明</Label>
-          <Input
-            id="introduction"
-            name="introduction"
-            as="textarea"
-            rows={3}
-            value={introduction}
-            onChange={onChangeIntroduction}
-          />
-        </Item>
-        <Item>
-          <Label>色</Label>
-          <ColorPicker color={color} setColor={setColor} />
-        </Item>
-      </ModalContent>
-      <ModalFooter>
-        {editFlag && name !== "未分類" && (
-          <DeleteButton onClick={onClickDelete}>削除</DeleteButton>
-        )}
-        <Button onClick={resetProject}>キャンセル</Button>
-        <CreateButton
-          editFlag={editFlag}
-          disabled={name === ""}
-          onClick={onClickAdd}
-        >
-          追加
-        </CreateButton>
-        <EditButton
-          editFlag={editFlag}
-          disabled={name === ""}
-          onClick={onClickEdit}
-        >
-          保存
-        </EditButton>
-      </ModalFooter>
-    </Modal>
+    <>
+      <Modal
+        isOpen={projectModalOpen}
+        onRequestClose={resetProject}
+        style={modalStyle}
+        contentLabel="プロジェクト追加"
+      >
+        <ModalHeader>
+          {editFlag ? "プロジェクト編集" : "プロジェクト追加"}
+        </ModalHeader>
+        <ModalContent>
+          <Item>
+            <Label htmlFor="name">名前(略称)</Label>
+            <Input
+              id="name"
+              maxLength={16}
+              name="name"
+              value={name}
+              onChange={onChangeName}
+            />
+          </Item>
+          <Item>
+            <Label htmlFor="introduction">説明</Label>
+            <Input
+              id="introduction"
+              name="introduction"
+              as="textarea"
+              rows={3}
+              value={introduction}
+              onChange={onChangeIntroduction}
+            />
+          </Item>
+          <Item>
+            <Label>色</Label>
+            <ColorPicker color={color} setColor={setColor} />
+          </Item>
+        </ModalContent>
+        <ModalFooter>
+          {editFlag && name !== "未分類" && (
+            <DeleteButton onClick={() => setDeleteDialogShow(true)}>
+              削除
+            </DeleteButton>
+          )}
+          <Button onClick={resetProject}>キャンセル</Button>
+          <CreateButton
+            editFlag={editFlag}
+            disabled={name === ""}
+            onClick={onClickAdd}
+          >
+            追加
+          </CreateButton>
+          <EditButton
+            editFlag={editFlag}
+            disabled={name === ""}
+            onClick={onClickEdit}
+          >
+            保存
+          </EditButton>
+        </ModalFooter>
+      </Modal>
+      <BootstrapModal
+        show={deleteDialogShow}
+        onHide={() => setDeleteDialogShow(false)}
+      >
+        <BootstrapModal.Header closeButton>
+          <BootstrapModal.Title>プロジェクトの削除</BootstrapModal.Title>
+        </BootstrapModal.Header>
+        <BootstrapModal.Body>
+          このプロジェクトを本当に削除してよろしいですか？
+        </BootstrapModal.Body>
+        <BootstrapModal.Footer>
+          <BootstrapButton
+            variant="secondary"
+            onClick={() => setDeleteDialogShow(false)}
+          >
+            いいえ
+          </BootstrapButton>
+          <BootstrapButton variant="danger" onClick={handleDelete}>
+            はい
+          </BootstrapButton>
+        </BootstrapModal.Footer>
+      </BootstrapModal>
+    </>
   );
 };
 
