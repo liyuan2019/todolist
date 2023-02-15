@@ -413,6 +413,11 @@ const TaskProject = styled.div`
   .dropup {
     background-color: ${theme.colors.backgroundInput};
   }
+
+  .dropdown-menu {
+    max-height: 150px;
+    overflow-y: scroll;
+  }
 `;
 
 const TaskPriority = styled.div`
