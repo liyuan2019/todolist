@@ -65,429 +65,384 @@ type SearchResult = {
   columnId: string;
 };
 
-type HeaderProps = {
-  // openTaskModal: () => void;
-  // openProjectModal: () => void;
-  // onClickTask: (todo: ToDo, columnId: string, taskId: string) => void;
-  // onClickProjectEdit: (project: Project) => void;
-  // setProjectFilterName: React.Dispatch<React.SetStateAction<string>>;
-};
+export const Header: React.FC = () => {
+  const dispatch = useDispatch();
+  const tasks = useSelector(selectAllTasks);
 
-export const Header: React.FC<HeaderProps> = () =>
-  // {
-  // openTaskModal,
-  // openProjectModal,
-  // onClickTask,
-  // onClickProjectEdit,
-  // setProjectFilterName,
-  // }
-  {
-    const dispatch = useDispatch();
-    const tasks = useSelector(selectAllTasks);
+  const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
+  const [isSignUp, setIsSignUp] = useState<boolean>(false);
+  const [seachText, setSearchText] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [loginError, setLoginError] = useState<string>("");
+  const [isLogged, setIsLogged] = useState<string>("");
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
+  const [composing, setComposition] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState<boolean>(false);
+  const [searchResult, setSearchResult] = useState<SearchResult[]>([]);
 
-    // const { onClickTask } = useTaskModal();
-    // const { onClickProjectEdit } = useProjectModal();
+  const onChangeSearchText = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+  };
 
-    const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
-    const [isSignUp, setIsSignUp] = useState<boolean>(false);
-    const [seachText, setSearchText] = useState<string>("");
-    const [name, setName] = useState<string>("");
-    const [email, setEmail] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
-    const [loginError, setLoginError] = useState<string>("");
-    const [isLogged, setIsLogged] = useState<string>("");
-    const [isDisabled, setIsDisabled] = useState<boolean>(false);
-    const [composing, setComposition] = useState(false);
-    const [searchModalOpen, setSearchModalOpen] = useState<boolean>(false);
-    const [searchResult, setSearchResult] = useState<SearchResult[]>([]);
+  const onChangeName = (e: ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value);
+  };
 
-    // const openProjectModal = () => dispatch(setProjectModalOpen(true));
-    // const openTaskModal = () => dispatch(setTaskModalOpen);
+  const onChangeEmail = (e: ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
 
-    // const filterByProject = (projectName: string) => {
-    //   dispatch(setProjectFilterName(projectName));
-    //   const newState = lodash.cloneDeep(tasks);
-    //   for (let key in newState.tasks) {
-    //     newState.tasks[key].show = true;
-    //   }
+  const onChangePassword = (e: ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
+  const openLoginModal = () => {
+    setIsSignUp(false);
+    setLoginModalOpen(true);
+  };
 
-    //   if (projectName !== "") {
-    //     const filteredIds = Object.entries(newState.tasks)
-    //       .filter(([key, value]) => value.content.projectName !== projectName)
-    //       .map(([key, value]) => key);
+  const closeLoginModal = () => {
+    setName("");
+    setEmail("");
+    setPassword("");
+    setLoginError("");
+    setLoginModalOpen(false);
+  };
 
-    //     filteredIds.forEach((id) => (newState.tasks[id].show = false));
-    //   }
+  const closeSearchModal = () => {
+    setSearchModalOpen(false);
+  };
 
-    //   dispatch(setTasks(newState));
-    // };
+  const openSignUp = () => {
+    setLoginError("");
+    setIsSignUp(true);
+  };
 
-    const onChangeSearchText = (e: ChangeEvent<HTMLInputElement>) => {
-      setSearchText(e.target.value);
+  const signUp = () => {
+    setIsDisabled(true);
+    setLoginError("");
+    if (email === "" || password === "" || name === "") {
+      setLoginError("All the inputs are required.");
+      return;
+    }
+    const data = JSON.stringify({
+      email: email,
+      password: password,
+      showname: name,
+      data: initialData,
+    });
+
+    const config = {
+      method: "post",
+      url: `${baseURL}/signup`,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: data,
     };
-
-    const onChangeName = (e: ChangeEvent<HTMLInputElement>) => {
-      setName(e.target.value);
-    };
-
-    const onChangeEmail = (e: ChangeEvent<HTMLInputElement>) => {
-      setEmail(e.target.value);
-    };
-
-    const onChangePassword = (e: ChangeEvent<HTMLInputElement>) => {
-      setPassword(e.target.value);
-    };
-    const openLoginModal = () => {
-      setIsSignUp(false);
-      setLoginModalOpen(true);
-    };
-
-    const closeLoginModal = () => {
-      setName("");
-      setEmail("");
-      setPassword("");
-      setLoginError("");
-      setLoginModalOpen(false);
-    };
-
-    const closeSearchModal = () => {
-      setSearchModalOpen(false);
-    };
-
-    const openSignUp = () => {
-      setLoginError("");
-      setIsSignUp(true);
-    };
-
-    const signUp = () => {
-      setIsDisabled(true);
-      setLoginError("");
-      if (email === "" || password === "" || name === "") {
-        setLoginError("All the inputs are required.");
-        return;
-      }
-      const data = JSON.stringify({
-        email: email,
-        password: password,
-        showname: name,
-        data: initialData,
+    axios(config)
+      .then((response) => {
+        setIsDisabled(false);
+        setName("");
+        setEmail("");
+        setPassword("");
+        setIsSignUp(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsDisabled(false);
+        setLoginError(error.response.data.message);
       });
+  };
 
-      const config = {
-        method: "post",
-        url: `${baseURL}/signup`,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: data,
-      };
-      axios(config)
-        .then((response) => {
-          setIsDisabled(false);
-          setName("");
-          setEmail("");
-          setPassword("");
-          setIsSignUp(false);
-        })
-        .catch((error) => {
-          console.log(error);
-          setIsDisabled(false);
-          setLoginError(error.response.data.message);
-        });
+  const login = () => {
+    setSearchText("");
+    setIsDisabled(true);
+    setLoginError("");
+    if (email === "" || password === "") {
+      setLoginError("All the inputs are required.");
+      return;
+    }
+    const data = JSON.stringify({
+      email: email,
+      password: password,
+    });
+
+    const config = {
+      method: "post",
+      url: `${baseURL}/login`,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: data,
     };
-
-    const login = () => {
-      setSearchText("");
-      setIsDisabled(true);
-      setLoginError("");
-      if (email === "" || password === "") {
-        setLoginError("All the inputs are required.");
-        return;
-      }
-      const data = JSON.stringify({
-        email: email,
-        password: password,
+    axios(config)
+      .then((response) => {
+        setIsDisabled(false);
+        setLoginModalOpen(false);
+        setIsLogged(response.data.showname);
+        dispatch(setTasks(response.data.data));
+        loginId = response.data._id;
+        setEmail("");
+        setPassword("");
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsDisabled(false);
+        setLoginError(error.response.data.message);
       });
+  };
 
-      const config = {
-        method: "post",
-        url: `${baseURL}/login`,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: data,
-      };
-      axios(config)
-        .then((response) => {
-          setIsDisabled(false);
-          setLoginModalOpen(false);
-          setIsLogged(response.data.showname);
-          dispatch(setTasks(response.data.data));
-          loginId = response.data._id;
-          setEmail("");
-          setPassword("");
-        })
-        .catch((error) => {
-          console.log(error);
-          setIsDisabled(false);
-          setLoginError(error.response.data.message);
+  const logout = () => {
+    setIsLogged("");
+    setSearchText("");
+    dispatch(setProjectFilterName(""));
+    dispatch(clearState());
+  };
+
+  const startComposition = () => setComposition(true);
+  const endComposition = () => setComposition(false);
+
+  const search = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !composing) {
+      const tasksList = tasks.tasks;
+
+      let taskStatus: { [key: string]: string } = {};
+      let result: SearchResult[] = [];
+      for (const [columnId, { taskIds }] of Object.entries(tasks.columns)) {
+        taskIds.forEach((taskId) => {
+          taskStatus[taskId] = columnId;
         });
-    };
+      }
 
-    const logout = () => {
-      setIsLogged("");
-      setSearchText("");
-      dispatch(setProjectFilterName(""));
-      dispatch(clearState());
-    };
-
-    const startComposition = () => setComposition(true);
-    const endComposition = () => setComposition(false);
-
-    const search = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === "Enter" && !composing) {
-        const tasksList = tasks.tasks;
-
-        let taskStatus: { [key: string]: string } = {};
-        let result: SearchResult[] = [];
-        for (const [columnId, { taskIds }] of Object.entries(tasks.columns)) {
-          taskIds.forEach((taskId) => {
-            taskStatus[taskId] = columnId;
+      for (const [taskId, { content }] of Object.entries(tasksList)) {
+        let searchContent: string[] = [];
+        let { subTask, ...params } = content;
+        searchContent.push(...Object.values(params));
+        searchContent.push(...subTask);
+        const searchContentStr = searchContent.join(",");
+        if (searchContentStr.includes(seachText)) {
+          result.push({
+            ...tasksList[taskId],
+            columnId: taskStatus[taskId],
           });
         }
-
-        for (const [taskId, { content }] of Object.entries(tasksList)) {
-          let searchContent: string[] = [];
-          let { subTask, ...params } = content;
-          searchContent.push(...Object.values(params));
-          searchContent.push(...subTask);
-          const searchContentStr = searchContent.join(",");
-          if (searchContentStr.includes(seachText)) {
-            result.push({
-              ...tasksList[taskId],
-              columnId: taskStatus[taskId],
-            });
-          }
-        }
-        setSearchResult(result);
-        setSearchModalOpen(true);
       }
-    };
+      setSearchResult(result);
+      setSearchModalOpen(true);
+    }
+  };
 
-    return (
-      <>
-        <HeaderStyle>
-          <Nav>
-            {/* <CgMenuGridR size={25} /> */}
-            <LogoLink to="/">
-              <SiTodoist size={20} color="#2684FF" />
-              ToDo
-            </LogoLink>
-            <MenuBar>
-              <Dropdown as={ButtonWrapper}>
-                <Dropdown.Toggle as={MenuButton}>
-                  <span>プロジェクト</span>
-                  <BiChevronDown size={16} color="#97A1AF" />
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  {tasks.projects.map((project) => (
-                    <Dropdown.Item
-                      key={project.name}
-                      onClick={() =>
-                        dispatch(setProjectFilterName(project.name))
-                      }
-                    >
-                      <Item>
-                        <span>{project.name}</span>
-                        <StyledMdEdit
-                          size={16}
-                          className="project"
-                          onClick={() => dispatch(setProjectModal(project))}
-                        />
-                      </Item>
-                    </Dropdown.Item>
-                  ))}
+  return (
+    <>
+      <HeaderStyle>
+        <Nav>
+          {/* <CgMenuGridR size={25} /> */}
+          <LogoLink to="/">
+            <SiTodoist size={20} color="#2684FF" />
+            ToDo
+          </LogoLink>
+          <MenuBar>
+            <Dropdown as={ButtonWrapper}>
+              <Dropdown.Toggle as={MenuButton}>
+                <span>プロジェクト</span>
+                <BiChevronDown size={16} color="#97A1AF" />
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                {tasks.projects.map((project) => (
                   <Dropdown.Item
-                    onClick={() => dispatch(setProjectFilterName(""))}
+                    key={project.name}
+                    onClick={() => dispatch(setProjectFilterName(project.name))}
                   >
-                    全部
+                    <Item>
+                      <span>{project.name}</span>
+                      <StyledMdEdit
+                        size={16}
+                        className="project"
+                        onClick={() => dispatch(setProjectModal(project))}
+                      />
+                    </Item>
                   </Dropdown.Item>
-                  <Dropdown.Item
-                    onClick={() => dispatch(setProjectModalOpen())}
-                  >
-                    <Add>
-                      <StyledAiOutlinePlus color="green" size={18} />
-                      <span>プロジェクト追加</span>
-                    </Add>
-                  </Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </MenuBar>
-            <CreateButton
-              onClick={() => dispatch(setTaskModalOpen())}
-              disabled={loginId === ""}
-            >
-              <Txt>作成</Txt>
-              <StyledMdAdd size={20} />
-            </CreateButton>
-            <Space />
-          </Nav>
-          <RightDiv>
-            <SeachWrapper data-tip="検索">
-              <Input
-                type="text"
-                placeholder="検索"
-                enterKeyHint="search"
-                value={seachText}
-                onChange={onChangeSearchText}
-                onCompositionStart={startComposition}
-                onCompositionEnd={endComposition}
-                onKeyDown={(e) => search(e)}
-              />
-              <SearchIcon />
-            </SeachWrapper>
-            <IconButtonSearch>
-              <IoMdSearch size={24} color={theme.colors.textLowEmphasis} />
-            </IconButtonSearch>
-            <IconButton data-tip="通知">
-              <StyledIoIosNotifications size={24} />
-            </IconButton>
-            <IconButton data-tip="へルプ">
-              <AiFillQuestionCircle size={24} />
-            </IconButton>
-            <IconButton data-tip="設定">
-              <IoIosSettings size={24} />
-            </IconButton>
-            {isLogged === "" ? (
-              <Button data-tip="プロフィールと設定" onClick={openLoginModal}>
-                {/* <ProfileImg /> */}
-                LOGIN
-              </Button>
-            ) : (
-              <Dropdown as={ButtonWrapper}>
-                <Dropdown.Toggle as={MenuButton}>
-                  <span>{isLogged}</span>
-                  <BiChevronDown size={16} color="#97A1AF" />
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <Dropdown.Item onClick={logout}>ログアウト</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            )}
-          </RightDiv>
-          {/* <ReactTooltip
+                ))}
+                <Dropdown.Item
+                  onClick={() => dispatch(setProjectFilterName(""))}
+                >
+                  全部
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => dispatch(setProjectModalOpen())}>
+                  <Add>
+                    <StyledAiOutlinePlus color="green" size={18} />
+                    <span>プロジェクト追加</span>
+                  </Add>
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </MenuBar>
+          <CreateButton
+            onClick={() => dispatch(setTaskModalOpen())}
+            disabled={loginId === ""}
+          >
+            <Txt>作成</Txt>
+            <StyledMdAdd size={20} />
+          </CreateButton>
+          <Space />
+        </Nav>
+        <RightDiv>
+          <SeachWrapper data-tip="検索">
+            <Input
+              type="text"
+              placeholder="検索"
+              enterKeyHint="search"
+              value={seachText}
+              onChange={onChangeSearchText}
+              onCompositionStart={startComposition}
+              onCompositionEnd={endComposition}
+              onKeyDown={(e) => search(e)}
+            />
+            <SearchIcon />
+          </SeachWrapper>
+          <IconButtonSearch>
+            <IoMdSearch size={24} color={theme.colors.textLowEmphasis} />
+          </IconButtonSearch>
+          <IconButton data-tip="通知">
+            <StyledIoIosNotifications size={24} />
+          </IconButton>
+          <IconButton data-tip="へルプ">
+            <AiFillQuestionCircle size={24} />
+          </IconButton>
+          <IconButton data-tip="設定">
+            <IoIosSettings size={24} />
+          </IconButton>
+          {isLogged === "" ? (
+            <Button data-tip="プロフィールと設定" onClick={openLoginModal}>
+              {/* <ProfileImg /> */}
+              LOGIN
+            </Button>
+          ) : (
+            <Dropdown as={ButtonWrapper}>
+              <Dropdown.Toggle as={MenuButton}>
+                <span>{isLogged}</span>
+                <BiChevronDown size={16} color="#97A1AF" />
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={logout}>ログアウト</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          )}
+        </RightDiv>
+        {/* <ReactTooltip
           place="bottom"
           type="dark"
           effect="solid"
           className="react-tool-tip"
         /> */}
-        </HeaderStyle>
-        <Modal
-          isOpen={loginModalOpen}
-          // onAfterOpen={afterOpenModal}
-          onRequestClose={closeLoginModal}
-          style={modalStyle}
-          contentLabel="ログイン"
-        >
-          <ModalHeader>{isSignUp ? "サインアップ" : "ログイン"}</ModalHeader>
-          <InputWrapper>
-            {isSignUp && (
-              <Input
-                type="text"
-                placeholder="name"
-                value={name}
-                onChange={onChangeName}
-              />
-            )}
+      </HeaderStyle>
+      <Modal
+        isOpen={loginModalOpen}
+        // onAfterOpen={afterOpenModal}
+        onRequestClose={closeLoginModal}
+        style={modalStyle}
+        contentLabel="ログイン"
+      >
+        <ModalHeader>{isSignUp ? "サインアップ" : "ログイン"}</ModalHeader>
+        <InputWrapper>
+          {isSignUp && (
             <Input
-              type="email"
-              placeholder="email"
-              value={email}
-              onChange={onChangeEmail}
+              type="text"
+              placeholder="name"
+              value={name}
+              onChange={onChangeName}
             />
-            <Input
-              type="password"
-              placeholder="password"
-              value={password}
-              onChange={onChangePassword}
-            />
-            <div>
-              <Button onClick={isSignUp ? signUp : login} disabled={isDisabled}>
-                {isSignUp ? "SIGN UP" : "LOGIN"}
-              </Button>
-              {loginError !== "" && <Error>{loginError}</Error>}
-              {/* {isSystemError && <Error>システムの原因でログイン出来ないです</Error>} */}
-            </div>
-            {!isSignUp && (
-              <MenuButtonStyled onClick={openSignUp}>
-                サインアップ(SIGN UP)
-              </MenuButtonStyled>
-            )}
-          </InputWrapper>
-        </Modal>
-        <Modal
-          isOpen={searchModalOpen}
-          onRequestClose={closeSearchModal}
-          style={searchModalStyle}
-          contentLabel="検索結果"
-        >
-          {searchResult.length === 0 && <p>No search results</p>}
-          {searchResult.length > 0 && (
-            <>
-              <ModalHeader>検索結果</ModalHeader>
-              <ResultWrapper>
-                {searchResult.map(({ id, content, columnId }) => {
-                  const projectColor =
-                    tasks.projects.find(
-                      ({ name }) => name === content.projectName
-                    )?.color ?? "white";
-                  const projectTextColor = textColorOfBg(
-                    projectColor ?? "#172B4D"
-                  );
-                  return (
-                    <Result
-                      onClick={() =>
-                        // onClickTask({ todo: content, columnId, taskId: id });
-                        dispatch(
-                          setTaskModal({ todo: content, columnId, taskId: id })
-                        )
-                      }
-                      key={id}
-                    >
-                      <span>{content.title}</span>
-                      <span
-                        className="date"
-                        data-is-expired={
-                          new Date(content.toDoDate) <
-                          new Date(new Date().toLocaleDateString())
-                        }
-                      >
-                        {content.toDoDate}
-                      </span>
-                      <div className="project">
-                        <StyledProject
-                          color={projectColor}
-                          projectTextColor={projectTextColor}
-                        >
-                          {content.projectName}
-                        </StyledProject>
-                      </div>
-
-                      <div className="status">
-                        <span data-type={initialData.columns[columnId].title}>
-                          {initialData.columns[columnId].title}
-                        </span>
-                      </div>
-                    </Result>
-                  );
-                })}
-              </ResultWrapper>
-            </>
           )}
-        </Modal>
-      </>
-    );
-  };
+          <Input
+            type="email"
+            placeholder="email"
+            value={email}
+            onChange={onChangeEmail}
+          />
+          <Input
+            type="password"
+            placeholder="password"
+            value={password}
+            onChange={onChangePassword}
+          />
+          <div>
+            <Button onClick={isSignUp ? signUp : login} disabled={isDisabled}>
+              {isSignUp ? "SIGN UP" : "LOGIN"}
+            </Button>
+            {loginError !== "" && <Error>{loginError}</Error>}
+            {/* {isSystemError && <Error>システムの原因でログイン出来ないです</Error>} */}
+          </div>
+          {!isSignUp && (
+            <MenuButtonStyled onClick={openSignUp}>
+              サインアップ(SIGN UP)
+            </MenuButtonStyled>
+          )}
+        </InputWrapper>
+      </Modal>
+      <Modal
+        isOpen={searchModalOpen}
+        onRequestClose={closeSearchModal}
+        style={searchModalStyle}
+        contentLabel="検索結果"
+      >
+        {searchResult.length === 0 && <p>No search results</p>}
+        {searchResult.length > 0 && (
+          <>
+            <ModalHeader>検索結果</ModalHeader>
+            <ResultWrapper>
+              {searchResult.map(({ id, content, columnId }) => {
+                const projectColor =
+                  tasks.projects.find(
+                    ({ name }) => name === content.projectName
+                  )?.color ?? "white";
+                const projectTextColor = textColorOfBg(
+                  projectColor ?? "#172B4D"
+                );
+                return (
+                  <Result
+                    onClick={() =>
+                      dispatch(
+                        setTaskModal({ todo: content, columnId, taskId: id })
+                      )
+                    }
+                    key={id}
+                  >
+                    <span>{content.title}</span>
+                    <span
+                      className="date"
+                      data-is-expired={
+                        new Date(content.toDoDate) <
+                        new Date(new Date().toLocaleDateString())
+                      }
+                    >
+                      {content.toDoDate}
+                    </span>
+                    <div className="project">
+                      <StyledProject
+                        color={projectColor}
+                        projectTextColor={projectTextColor}
+                      >
+                        {content.projectName}
+                      </StyledProject>
+                    </div>
+
+                    <div className="status">
+                      <span data-type={initialData.columns[columnId].title}>
+                        {initialData.columns[columnId].title}
+                      </span>
+                    </div>
+                  </Result>
+                );
+              })}
+            </ResultWrapper>
+          </>
+        )}
+      </Modal>
+    </>
+  );
+};
 
 const ResultWrapper = styled.ul`
   padding-left: 0px;

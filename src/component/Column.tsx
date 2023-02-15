@@ -5,22 +5,13 @@ import styled from "styled-components";
 import { Task } from "./Task";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
-// import { useTaskModal } from "../hooks/useTaskModal";
 
 type ColumnProps = {
   column: ToDoColumn;
   tasks: ToDoTask[];
-  // onClickTask: (todo: ToDo, columnId: string, taskId: string) => void;
-  // projects: Project[];
 };
 
-export const Column: React.FC<ColumnProps> = ({
-  column,
-  tasks,
-  // onClickTask,
-  // projects,
-  // onClickDelete,
-}) => {
+export const Column: React.FC<ColumnProps> = ({ column, tasks }) => {
   const projectFilterName = useSelector(
     (state: RootState) => state.filter.projectFilterName
   );
@@ -39,8 +30,6 @@ export const Column: React.FC<ColumnProps> = ({
                     task={task}
                     columnId={column.id}
                     index={index}
-                    // onClickTask={onClickTask}
-                    // projects={projects}
                   />
                 )
             )}

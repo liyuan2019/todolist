@@ -6,31 +6,13 @@ import { Header } from "./Header";
 
 type LayoutProps = {
   children: ReactNode;
-  // openTaskModal: () => void;
-  // openProjectModal: () => void;
-  // onClickTask: (todo: ToDo, columnId: string, taskId: string) => void;
-  // onClickProjectEdit: (project: Project) => void;
-  // setProjectFilterName: React.Dispatch<React.SetStateAction<string>>;
 };
 
-export const Layout: React.FC<LayoutProps> = ({
-  children,
-  // openTaskModal,
-  // openProjectModal,
-  // onClickTask,
-  // onClickProjectEdit,
-  // setProjectFilterName,
-}) => {
+export const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <Header
-      // openTaskModal={openTaskModal}
-      // openProjectModal={openProjectModal}
-      // onClickTask={onClickTask}
-      // onClickProjectEdit={onClickProjectEdit}
-      // setProjectFilterName={setProjectFilterName}
-      />
+      <Header />
       <Main>{children}</Main>
     </ThemeProvider>
   );

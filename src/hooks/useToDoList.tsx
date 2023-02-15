@@ -23,12 +23,6 @@ export const useToDoList = () => {
       newState.columns["column-1"].taskIds.push(newToDoTask.id);
       newState.count++;
       dispatch(setTasks(newState));
-
-      // const updateState = lodash.cloneDeep(newState);
-      // const filteredIds = Object.entries(updateState.tasks)
-      //   .filter(([key, value]) => !value.show)
-      //   .map(([key, value]) => key);
-      // filteredIds.forEach((id) => (updateState.tasks[id].show = true));
       updateTasks(newState);
     },
     [dispatch, tasks, updateTasks]
@@ -43,12 +37,6 @@ export const useToDoList = () => {
         1
       );
       dispatch(setTasks(newState));
-
-      // const updateState = lodash.cloneDeep(newState);
-      // const filteredIds = Object.entries(updateState.tasks)
-      //   .filter(([key, value]) => !value.show)
-      //   .map(([key, value]) => key);
-      // filteredIds.forEach((id) => (updateState.tasks[id].show = true));
       updateTasks(newState);
     },
     [dispatch, tasks, updateTasks]
@@ -59,12 +47,6 @@ export const useToDoList = () => {
       const newState = lodash.cloneDeep(tasks);
       newState.tasks[id].content = toDo;
       dispatch(setTasks(newState));
-
-      // const updateState = lodash.cloneDeep(newState);
-      // const filteredIds = Object.entries(updateState.tasks)
-      //   .filter(([key, value]) => !value.show)
-      //   .map(([key, value]) => key);
-      // filteredIds.forEach((id) => (updateState.tasks[id].show = true));
       updateTasks(newState);
     },
     [dispatch, tasks, updateTasks]

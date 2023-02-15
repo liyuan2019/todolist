@@ -4,10 +4,8 @@ import { DragDropContext } from "react-beautiful-dnd";
 import styled from "styled-components";
 import { Layout } from "./component/Layout";
 import { useDrag } from "./hooks/useDrag";
-// import { useTaskModal } from "./hooks/useTaskModal";
 import { TaskModal } from "./component/TaskModal";
 import { ProjectModal } from "./component/ProjectModal";
-// import { useProjectModal } from "./hooks/useProjectModal";
 import { textColorOfBg } from "./utils/text-color";
 import { useSelector } from "react-redux";
 import { selectAllTasks } from "./store/tasksSlice";
@@ -19,33 +17,14 @@ export const App: React.FC = () => {
 
   const { onDragEnd } = useDrag();
 
-  // const UseTaskModalReturn = useTaskModal();
-  // const useProjectModalReturn = useProjectModal();
-  // const { openTaskModal, onClickTask } = UseTaskModalReturn;
-  // const {
-  //   openProjectModal,
-  //   onClickProjectEdit,
-  //   projectFilterName,
-  //   setProjectFilterName,
-  // } = useProjectModalReturn;
-
-  // const { onClickTask } = useTaskModal();
-
   const project = tasks.projects.find(({ name }) => name === projectFilterName);
   const projectColor = project?.color ?? "white";
   const projectTextColor = textColorOfBg(projectColor ?? "#172B4D");
   const projectIntrodution = project?.introduction ?? "";
 
   return (
-    <Layout
-    // onClickTask={onClickTask}
-    // onClickProjectEdit={onClickProjectEdit}
-    >
-      <TaskModal
-      // UseTaskModalReturn={UseTaskModalReturn}
-      // openProjectModal={openProjectModal}
-      />
-      {/* <ProjectModal useProjectModalReturn={useProjectModalReturn} /> */}
+    <Layout>
+      <TaskModal />
       <ProjectModal />
       {projectFilterName !== "" && (
         <ProjectInfo>
@@ -66,13 +45,7 @@ export const App: React.FC = () => {
               (taskId) => tasks.tasks[taskId]
             );
             return (
-              <Column
-                key={column.id}
-                column={column}
-                tasks={tasksOfcolumn}
-                // onClickTask={onClickTask}
-                // projects={tasks.projects}
-              />
+              <Column key={column.id} column={column} tasks={tasksOfcolumn} />
             );
           })}
         </Container>

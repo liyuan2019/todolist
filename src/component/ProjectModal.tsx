@@ -25,97 +25,84 @@ const modalStyle = {
   },
 };
 
-type ProjectModalProps = {
-  // useProjectModalReturn: UseProjectModalReturn;
+export const ProjectModal: React.FC = () => {
+  const {
+    name,
+    introduction,
+    color,
+    resetProject,
+    onChangeName,
+    onChangeIntroduction,
+    setColor,
+    onClickAdd,
+    onClickEdit,
+    onClickDelete,
+  } = useProjectModal();
+
+  const { projectModalOpen, editFlag } = useSelector(
+    (state: RootState) => state.projectModal
+  );
+
+  return (
+    <Modal
+      isOpen={projectModalOpen}
+      onRequestClose={resetProject}
+      style={modalStyle}
+      contentLabel="プロジェクト追加"
+    >
+      <ModalHeader>
+        {editFlag ? "プロジェクト編集" : "プロジェクト追加"}
+      </ModalHeader>
+      <ModalContent>
+        <Item>
+          <Label htmlFor="name">名前(略称)</Label>
+          <Input
+            id="name"
+            maxLength={16}
+            name="name"
+            value={name}
+            onChange={onChangeName}
+          />
+        </Item>
+        <Item>
+          <Label htmlFor="introduction">説明</Label>
+          <Input
+            id="introduction"
+            name="introduction"
+            as="textarea"
+            rows={3}
+            value={introduction}
+            onChange={onChangeIntroduction}
+          />
+        </Item>
+        <Item>
+          <Label>色</Label>
+          <ColorPicker color={color} setColor={setColor} />
+        </Item>
+      </ModalContent>
+      <ModalFooter>
+        {editFlag && name !== "未分類" && (
+          <DeleteButton onClick={onClickDelete}>削除</DeleteButton>
+        )}
+        <Button onClick={resetProject}>キャンセル</Button>
+        <CreateButton
+          editFlag={editFlag}
+          disabled={name === ""}
+          onClick={onClickAdd}
+        >
+          追加
+        </CreateButton>
+        <EditButton
+          editFlag={editFlag}
+          disabled={name === ""}
+          onClick={onClickEdit}
+        >
+          保存
+        </EditButton>
+      </ModalFooter>
+    </Modal>
+  );
 };
-
-export const ProjectModal: React.FC<ProjectModalProps> = () =>
-  // {
-  // useProjectModalReturn,
-  // }
-  {
-    const {
-      // projectModalOpen,
-      name,
-      introduction,
-      color,
-      // projectEditFlag,
-      // closeProjectModal,
-      resetProject,
-      onChangeName,
-      onChangeIntroduction,
-      setColor,
-      // onClickCancel,
-      onClickAdd,
-      onClickEdit,
-      onClickDelete,
-    } = useProjectModal();
-
-    // const projectModalOpen = useSelector(selectProjectModalOpen);
-    const { projectModalOpen, editFlag } = useSelector(
-      (state: RootState) => state.projectModal
-    );
-
-    return (
-      <Modal
-        isOpen={projectModalOpen}
-        onRequestClose={resetProject}
-        style={modalStyle}
-        contentLabel="プロジェクト追加"
-      >
-        <ModalHeader>
-          {editFlag ? "プロジェクト編集" : "プロジェクト追加"}
-        </ModalHeader>
-        <ModalContent>
-          <Item>
-            <Label htmlFor="name">名前(略称)</Label>
-            <Input
-              id="name"
-              maxLength={16}
-              name="name"
-              value={name}
-              onChange={onChangeName}
-            />
-          </Item>
-          <Item>
-            <Label htmlFor="introduction">説明</Label>
-            <Input
-              id="introduction"
-              name="introduction"
-              as="textarea"
-              rows={3}
-              value={introduction}
-              onChange={onChangeIntroduction}
-            />
-          </Item>
-          <Item>
-            <Label>色</Label>
-            <ColorPicker color={color} setColor={setColor} />
-          </Item>
-        </ModalContent>
-        <ModalFooter>
-          {editFlag && name !== "未分類" && (
-            <DeleteButton onClick={onClickDelete}>削除</DeleteButton>
-          )}
-          <Button onClick={resetProject}>キャンセル</Button>
-          <CreateButton
-            editFlag={editFlag}
-            disabled={name === ""}
-            onClick={onClickAdd}
-          >
-            追加
-          </CreateButton>
-          <EditButton
-            editFlag={editFlag}
-            disabled={name === ""}
-            onClick={onClickEdit}
-          >
-            保存
-          </EditButton>
-        </ModalFooter>
-      </Modal>
-    );
-  };
 
 const ModalHeader = styled.div`
   font-size: 20px;

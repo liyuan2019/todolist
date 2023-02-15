@@ -1,12 +1,6 @@
 import { initialData } from "../data/initial-data";
 import { createSelector, createSlice } from "@reduxjs/toolkit";
 import { RootState } from ".";
-// import { Board } from "../type";
-// import { createAsyncThunk, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-
-// const tasksAdapter = createEntityAdapter<Board>()
-
-// const initialState = tasksAdapter.getInitialState(initialData)
 
 export const tasksSlice = createSlice({
   name: "tasks",

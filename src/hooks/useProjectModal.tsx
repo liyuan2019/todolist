@@ -12,18 +12,9 @@ export const useProjectModal = () => {
     (state: RootState) => state.projectModal
   );
 
-  // const [project, setProject] = useState<Project>({
-  //   name: "",
-  //   introduction: "",
-  //   color: "#f44336",
-  // });
   const [name, setName] = useState<string>("未分類");
   const [introduction, setIntroduction] = useState<string>("");
   const [color, setColor] = useState<string>("#f44336");
-  // const [projectEditFlag, setProjectEditFlag] = useState<boolean>(false);
-  // const [projectEditName, setProjectEditName] = useState<string>("");
-  // const [projectFilterName, setProjectFilterName] = useState<string>("");
-  // const [projectModalOpen, setProjectModalOpen] = useState<boolean>(false);
 
   const { updateTasks } = useUpdateTasks();
 
@@ -35,14 +26,6 @@ export const useProjectModal = () => {
     setColor(project.color);
   }, [project.name, project.introduction, project.color]);
 
-  // function openProjectModal() {
-  //   dispatch(setProjectModalOpen(true));
-  // }
-
-  // function closeProjectModal() {
-  //   dispatch(setProjectModalOpen(false));
-  // }
-
   const onChangeName = (e: ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
   };
@@ -50,10 +33,6 @@ export const useProjectModal = () => {
   const onChangeIntroduction = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setIntroduction(e.target.value);
   };
-
-  // const onChangeColor = (color: string) => {
-  //   setColor(color);
-  // };
 
   const resetProject = () => {
     setName("");
@@ -104,13 +83,6 @@ export const useProjectModal = () => {
     [dispatch, tasks, updateTasks]
   );
 
-  // const onClickProjectEdit = (project: Project) => {
-  //   setProject(project);
-  //   setProjectEditFlag(true);
-  //   setProjectEditName(project.name);
-  //   openProjectModal();
-  // };
-
   const onClickAdd = () => {
     const project: Project = {
       name,
@@ -118,14 +90,8 @@ export const useProjectModal = () => {
       color,
     };
     addProject(project);
-    // dispatch(resetProjectModal());
     resetProject();
   };
-
-  // const onClickCancel = () => {
-  //   reset();
-  //   closeProjectModal();
-  // };
 
   const onClickEdit = () => {
     const project: Project = {
@@ -134,35 +100,22 @@ export const useProjectModal = () => {
       color,
     };
     editProject(project, editName);
-    // dispatch(resetProjectModal());
     resetProject();
   };
 
   const onClickDelete = () => {
-    // e.stopPropagation();
     deleteProject(editName);
-    // dispatch(resetProjectModal());
     resetProject();
   };
 
   return {
-    // projectModalOpen,
     name,
     introduction,
     color,
-    // projectEditFlag,
-    // // projectEditName,
-    // projectFilterName,
-    // setProjectFilterName,
-    // openProjectModal,
-    // closeProjectModal,
     resetProject,
     onChangeName,
     onChangeIntroduction,
-    // onChangeColor,
     setColor,
-    // onClickProjectEdit,
-    // onClickCancel,
     onClickAdd,
     onClickEdit,
     onClickDelete,

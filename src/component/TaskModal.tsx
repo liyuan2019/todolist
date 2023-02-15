@@ -34,245 +34,211 @@ const modalStyle = {
   },
 };
 
-type TaskModalProps = {
-  // UseTaskModalReturn: UseTaskModalReturn;
-  // openProjectModal: () => void;
-};
+export const TaskModal: React.FC = () => {
+  const dispatch = useDispatch();
+  const { taskModalOpen, editFlag, editColumnId } = useSelector(
+    (state: RootState) => state.taskModal
+  );
+  const projects = useSelector((state: RootState) =>
+    state.tasks.projects.map((p) => p.name)
+  );
 
-export const TaskModal: React.FC<TaskModalProps> = () =>
-  // {
-  // UseTaskModalReturn,
-  // openProjectModal,
-  // }
-  {
-    const projects = useSelector((state: RootState) =>
-      state.tasks.projects.map((p) => p.name)
-    );
+  registerLocale("ja", ja);
+  const today = new Date();
 
-    const dispatch = useDispatch();
+  const {
+    title,
+    memo,
+    subTask,
+    toDoDate,
+    priority,
+    projectName,
+    resetTask,
+    onChangeTitle,
+    onChangeMemo,
+    onChangeSubTask,
+    onClickSubTaskAdd,
+    onChangePriority,
+    onChangeProjectName,
+    setTodoDate,
+    onClickAdd,
+    onClickEdit,
+    onClickDelete,
+  } = useTaskModal();
 
-    registerLocale("ja", ja);
-    const today = new Date();
+  const textAreaRef = useAutoResizeTextArea(memo);
 
-    const {
-      title,
-      memo,
-      subTask,
-      toDoDate,
-      priority,
-      projectName,
-      // editFlag,
-      // editColumnId,
-      // closeModal,
-      resetTask,
-      onChangeTitle,
-      onChangeMemo,
-      onChangeSubTask,
-      onClickSubTaskAdd,
-      onChangePriority,
-      onChangeProjectName,
-      setTodoDate,
-      // onClickCancel,
-      onClickAdd,
-      onClickEdit,
-      onClickDelete,
-    } = useTaskModal();
-
-    const textAreaRef = useAutoResizeTextArea(memo);
-
-    // const taskModalOpen = useSelector(selectTaskModalOpen);
-    const { taskModalOpen, editFlag, editColumnId } = useSelector(
-      (state: RootState) => state.taskModal
-    );
-    // const openProjectModal = () => dispatch(setProjectModalOpen(true));
-
-    return (
-      <>
-        <Modal
-          isOpen={taskModalOpen}
-          onRequestClose={resetTask}
-          style={modalStyle}
-          contentLabel="タスクを作成"
-        >
-          <ModalHeader>
-            <span>{editFlag ? "タスクを修正" : "タスクを作成"}</span>
-            {editFlag && (
-              <span
-                className="status"
-                data-type={initialData.columns[editColumnId].title}
-              >
-                {initialData.columns[editColumnId].title}
-              </span>
+  return (
+    <>
+      <Modal
+        isOpen={taskModalOpen}
+        onRequestClose={resetTask}
+        style={modalStyle}
+        contentLabel="タスクを作成"
+      >
+        <ModalHeader>
+          <span>{editFlag ? "タスクを修正" : "タスクを作成"}</span>
+          {editFlag && (
+            <span
+              className="status"
+              data-type={initialData.columns[editColumnId].title}
+            >
+              {initialData.columns[editColumnId].title}
+            </span>
+          )}
+        </ModalHeader>
+        <CreateTask>
+          <Title
+            placeholder="タイトル"
+            type="text"
+            value={title}
+            onChange={onChangeTitle}
+          />
+          <Memo
+            placeholder="メモ"
+            value={memo}
+            onChange={onChangeMemo}
+            ref={textAreaRef}
+          ></Memo>
+          <Subtask>
+            {subTask.map(
+              (sub, index) =>
+                sub !== null && (
+                  <li key={`subtask_${index}`}>
+                    <input
+                      placeholder="サブタスク"
+                      type="text"
+                      value={sub}
+                      onChange={(e) => onChangeSubTask(e, index)}
+                      autoFocus={index === subTask.length - 1 ? true : false}
+                    ></input>
+                  </li>
+                )
             )}
-          </ModalHeader>
-          <CreateTask>
-            <Title
-              placeholder="タイトル"
-              type="text"
-              value={title}
-              onChange={onChangeTitle}
-            />
-            <Memo
-              placeholder="メモ"
-              value={memo}
-              onChange={onChangeMemo}
-              ref={textAreaRef}
-            ></Memo>
-            <Subtask>
-              {subTask.map(
-                (sub, index) =>
-                  sub !== null && (
-                    <li key={`subtask_${index}`}>
-                      <input
-                        placeholder="サブタスク"
-                        type="text"
-                        value={sub}
-                        onChange={(e) => onChangeSubTask(e, index)}
-                        autoFocus={index === subTask.length - 1 ? true : false}
-                      ></input>
-                    </li>
-                  )
-              )}
-            </Subtask>
-            <SubtaskCreateButton id="subTaskAdd" onClick={onClickSubTaskAdd}>
-              <HiPlus color={theme.colors.primaryblue} />
-              <span>サブタスクを追加</span>
-            </SubtaskCreateButton>
-            <Others>
-              <TaskDate>
-                <RiCalendarTodoFill color={theme.colors.primaryblue} />
-                <div
-                  data-is-expired={
-                    new Date(toDoDate) <
-                    new Date(new Date().toLocaleDateString())
+          </Subtask>
+          <SubtaskCreateButton id="subTaskAdd" onClick={onClickSubTaskAdd}>
+            <HiPlus color={theme.colors.primaryblue} />
+            <span>サブタスクを追加</span>
+          </SubtaskCreateButton>
+          <Others>
+            <TaskDate>
+              <RiCalendarTodoFill color={theme.colors.primaryblue} />
+              <div
+                data-is-expired={
+                  new Date(toDoDate) < new Date(new Date().toLocaleDateString())
+                }
+              >
+                <DatePicker
+                  popperPlacement="right-start"
+                  className="date-picker"
+                  selected={new Date(toDoDate)}
+                  onChange={(date) =>
+                    setTodoDate(date ? date.toLocaleDateString() : "")
                   }
-                >
-                  <DatePicker
-                    popperPlacement="right-start"
-                    className="date-picker"
-                    selected={new Date(toDoDate)}
-                    onChange={(date) =>
-                      setTodoDate(date ? date.toLocaleDateString() : "")
-                    }
-                    locale="ja"
-                    dateFormat="yyyy/MM/dd"
-                    minDate={today}
-                    dateFormatCalendar={"yyyy年 MM月"}
-                  />
-                </div>
-              </TaskDate>
-              <TaskProject>
-                <label>プロジェクト</label>
-                <Dropdown as={ButtonWrapper} drop="up" id="project">
-                  <Dropdown.Toggle as={MenuButton}>
+                  locale="ja"
+                  dateFormat="yyyy/MM/dd"
+                  minDate={today}
+                  dateFormatCalendar={"yyyy年 MM月"}
+                />
+              </div>
+            </TaskDate>
+            <TaskProject>
+              <label>プロジェクト</label>
+              <Dropdown as={ButtonWrapper} drop="up" id="project">
+                <Dropdown.Toggle as={MenuButton}>
+                  <Option>
+                    <span>{projectName}</span>
+                    <BiChevronDown size={16} color="#97A1AF" />
+                  </Option>
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  {projects.map((p) => (
+                    <Dropdown.Item
+                      key={p}
+                      onClick={(e) => onChangeProjectName(p)}
+                    >
+                      <Option>
+                        <span>{p}</span>
+                      </Option>
+                    </Dropdown.Item>
+                  ))}
+                  <Dropdown.Item
+                    onClick={() => dispatch(setProjectModalOpen())}
+                  >
                     <Option>
-                      <span>{projectName}</span>
-                      <BiChevronDown size={16} color="#97A1AF" />
+                      <AiOutlinePlus color="green" size={18} />
+                      <span>プロジェクト追加</span>
                     </Option>
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    {projects.map((p) => (
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            </TaskProject>
+            <TaskPriority>
+              <label>優先度</label>
+              <Dropdown as={ButtonWrapper} drop="end">
+                <Dropdown.Toggle as={MenuButton}>
+                  <Option>
+                    <img
+                      src={
+                        priorities.filter((p) => p.priority === priority)[0]
+                          .imgPath
+                      }
+                      alt=""
+                      width={20}
+                      height={20}
+                    />
+                    <span>
+                      {
+                        priorities.filter((p) => p.priority === priority)[0]
+                          .text
+                      }
+                    </span>
+                    <BiChevronDown size={16} color="#97A1AF" />
+                  </Option>
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  {priorities
+                    .filter((p) => p.priority !== priority)
+                    .map(({ priority, text, imgPath }) => (
                       <Dropdown.Item
-                        key={p}
-                        onClick={(e) => onChangeProjectName(p)}
+                        onClick={(e) => onChangePriority(priority)}
+                        key={priority}
                       >
                         <Option>
-                          <span>{p}</span>
+                          <img src={imgPath} alt="" width={20} height={20} />
+                          <span>{text}</span>
                         </Option>
                       </Dropdown.Item>
                     ))}
-                    <Dropdown.Item
-                      onClick={() => dispatch(setProjectModalOpen())}
-                    >
-                      <Option>
-                        <AiOutlinePlus color="green" size={18} />
-                        <span>プロジェクト追加</span>
-                      </Option>
-                    </Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-              </TaskProject>
-              <TaskPriority>
-                <label>優先度</label>
-                {/* <select
-              name="priority"
-              value={priority}
-              onChange={onChangePriority}
-            >
-              {priorities.map((priority, i) => (
-                <option
-                  value={priority}
-                  className={"priority" + i}
-                  key={priority}
-                >
-                  {priority}
-                </option>
-              ))}
-            </select> */}
-                <Dropdown as={ButtonWrapper} drop="end">
-                  <Dropdown.Toggle as={MenuButton}>
-                    <Option>
-                      <img
-                        src={
-                          priorities.filter((p) => p.priority === priority)[0]
-                            .imgPath
-                        }
-                        alt=""
-                        width={20}
-                        height={20}
-                      />
-                      <span>
-                        {
-                          priorities.filter((p) => p.priority === priority)[0]
-                            .text
-                        }
-                      </span>
-                      <BiChevronDown size={16} color="#97A1AF" />
-                    </Option>
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    {priorities
-                      .filter((p) => p.priority !== priority)
-                      .map(({ priority, text, imgPath }) => (
-                        <Dropdown.Item
-                          onClick={(e) => onChangePriority(priority)}
-                          key={priority}
-                        >
-                          <Option>
-                            <img src={imgPath} alt="" width={20} height={20} />
-                            <span>{text}</span>
-                          </Option>
-                        </Dropdown.Item>
-                      ))}
-                  </Dropdown.Menu>
-                </Dropdown>
-              </TaskPriority>
-            </Others>
-          </CreateTask>
-          <ModalFooter>
-            {editFlag && (
-              <DeleteButton onClick={onClickDelete}>削除</DeleteButton>
-            )}
-            <Button onClick={resetTask}>キャンセル</Button>
-            <CreateButton
-              editFlag={editFlag}
-              disabled={title === ""}
-              onClick={onClickAdd}
-            >
-              作成
-            </CreateButton>
-            <EditButton
-              editFlag={editFlag}
-              disabled={title === ""}
-              onClick={onClickEdit}
-            >
-              修正
-            </EditButton>
-          </ModalFooter>
-        </Modal>
-      </>
-    );
-  };
+                </Dropdown.Menu>
+              </Dropdown>
+            </TaskPriority>
+          </Others>
+        </CreateTask>
+        <ModalFooter>
+          {editFlag && (
+            <DeleteButton onClick={onClickDelete}>削除</DeleteButton>
+          )}
+          <Button onClick={resetTask}>キャンセル</Button>
+          <CreateButton
+            editFlag={editFlag}
+            disabled={title === ""}
+            onClick={onClickAdd}
+          >
+            作成
+          </CreateButton>
+          <EditButton
+            editFlag={editFlag}
+            disabled={title === ""}
+            onClick={onClickEdit}
+          >
+            修正
+          </EditButton>
+        </ModalFooter>
+      </Modal>
+    </>
+  );
+};
 
 const ModalHeader = styled.div`
   display: flex;
@@ -457,38 +423,6 @@ const TaskPriority = styled.div`
   .dropend {
     background-color: ${theme.colors.backgroundInput};
   }
-
-  /* option {
-    height: 25px;
-    text-align: center;
-    background-size: 15px;
-    background-repeat: no-repeat;
-    background-position: 5px 2px;
-  }
-
-  .priority0 {
-    background-image: url("/images/icons/priorities/highest.svg");
-  }
-
-  .priority1 {
-    background-image: url("/images/icons/priorities/high.svg");
-  }
-
-  .priority2 {
-    background-image: url("/images/icons/priorities/medium.svg");
-  }
-
-  .priority3 {
-    background-image: url("/images/icons/priorities/low.svg");
-  }
-
-  .priority4 {
-    background-image: url("/images/icons/priorities/lowest.svg");
-  }
-
-  .priority5 {
-    background-image: url("/images/icons/priorities/none.svg");
-  } */
 `;
 
 const Option = styled.div`

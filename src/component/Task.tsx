@@ -13,24 +13,11 @@ type TaskProps = {
   task: ToDoTask;
   index: number;
   columnId: string;
-  // onClickTask: (todo: ToDo, columnId: string, taskId: string) => void;
-  // projects: Project[];
 };
 
-export const Task: React.FC<TaskProps> = ({
-  task,
-  index,
-  columnId,
-  // onClickTask,
-  // projects,
-}) => {
+export const Task: React.FC<TaskProps> = ({ task, index, columnId }) => {
   const dispatch = useDispatch();
 
-  // const { onClickTask } = useTaskModal();
-
-  // const projectColor =
-  //   projects.find(({ name }) => name === task.content.projectName)?.color ??
-  //   "white";
   const projectColor = useSelector((state: RootState) =>
     selectProjectColor(state, task.content.projectName)
   );
@@ -89,7 +76,6 @@ export const Task: React.FC<TaskProps> = ({
 };
 
 const Container = styled.div`
-  /* border: 1px solid lightgrey; */
   border-radius: 3px;
   box-shadow: rgba(23, 43, 77, 0.2) 0 1px 1px 0, rgba(23, 43, 77, 0.2) 0 0 1px 0;
   transition: background-color 140ms ease-in-out 0s, color 140ms ease-in-out 0s;
@@ -100,23 +86,12 @@ const Container = styled.div`
 
   &:hover {
     opacity: 0.6;
-
-    /* svg {
-      display: inline-block;
-    } */
   }
 `;
-
-// const StyledAiOutlineCloseCircle = styled(AiOutlineCloseCircle)`
-//   display: none;
-// `;
 
 const Title = styled.div`
   word-wrap: break-word;
   word-break: break-word;
-
-  /* display: flex;
-  justify-content: space-between; */
 `;
 
 const Memo = styled.p`
